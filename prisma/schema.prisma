@@ -15,17 +15,23 @@ datasource db {
 
 // 스타일
 model Style {
-  id          String     @id @default(uuid())
-  title       String
-  description String?
-  password    String
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-  viewCount   Int        @default(0)
-  tags        Tag[]
-  images      Image[]
-  items       Item[]
-  curations   Curation[]
+  id                   String     @id @default(uuid())
+  nickName             String
+  title                String
+  description          String?
+  password             String
+  trendyAverage        Decimal    @default(0.0)
+  uniqueAverage        Decimal    @default(0.0)
+  practicalAverage     Decimal    @default(0.0)
+  costEffectiveAverage Decimal    @default(0.0)
+  totalAverage         Decimal    @default(0.0)
+  createdAt            DateTime   @default(now())
+  updatedAt            DateTime   @updatedAt
+  viewCount            Int        @default(0)
+  tags                 Tag[]
+  images               Image[]
+  items                Item[]
+  curations            Curation[]
 
   @@index([title, description])
 }
@@ -54,12 +60,13 @@ enum Category {
 
 // 태그
 model Tag {
-  id            String   @id @default(uuid())
-  tag           String   @unique
-  lookbookCount Int      @default(0) // <-태그당 룩북수
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  styles        Style[]
+  id         String   @id @default(uuid())
+  tag        String   @unique
+  styleCount Int      @default(0) // <-태그당 룩북수
+  clickCount Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  styles     Style[]
 }
 
 // 이미지
@@ -75,18 +82,17 @@ model Image {
 
 // 큐레이팅
 model Curation {
-  id              String           @id @default(uuid())
-  trendy          Int              @default(0)
-  unique          Int              @default(0)
-  practical       Int              @default(0)
-  costEffective   Int              @default(0)
-  average         Decimal          @default(0.0)
-  content         String
-  nickName        String
-  password        String
-  style           Style            @relation(fields: [styleId], references: [id], onDelete: Cascade)
-  styleId         String
-  curationComment CurationComment?
+  id               String           @id @default(uuid())
+  trendy           Int              @default(0)
+  personality      Int              @default(0)
+  practicality     Int              @default(0)
+  costEffectivness Int              @default(0)
+  content          String
+  nickName         String
+  password         String
+  style            Style            @relation(fields: [styleId], references: [id], onDelete: Cascade)
+  styleId          String
+  curationComment  CurationComment?
 }
 
 // 덧글
