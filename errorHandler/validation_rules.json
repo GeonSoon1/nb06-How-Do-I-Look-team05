@@ -1,0 +1,42 @@
+{
+  "module": "validation",
+  "rules": {
+    "string": { "trim": true, "min": 1, "max": 100 },
+    "number": { "min": 0, "integer": true },
+    "array": { "max": 50, "allowDuplicates": false },
+    "id": { "type": "uuid|number" },
+    "datetime": { "format": "ISO8601", "timezone": "UTC" }
+  },
+  "fields": {
+    "style.name": { "min": 2, "max": 50, "unique": true },
+    "curating.title": { "min": 1, "max": 100, "unique": true },
+    "curating.items": {
+      "minItems": 1,
+      "maxItems": 50,
+      "uniqueItems": true,
+      "itemType": "id"
+    },
+    "comment.content": { "min": 1, "max": 1000, "profanityFilter": true }
+  },
+  "commonErrors": [
+    {
+      "code": "VALIDATION_FAILED",
+      "httpStatus": 400,
+      "message": "요청 유효성 검사를 통과하지 못했습니다.",
+      "fields": [
+        { "field": "title", "reason": "최대 길이 100자 초과" },
+        { "field": "items", "reason": "중복 요소 포함" }
+      ]
+    }
+  ],
+  "httpMapping": {
+    "400": ["형식/유효성 오류", "잘못된 쿼리"],
+    "401": ["인증 필요"],
+    "403": ["권한 부족", "정책 위반"],
+    "404": ["리소스 없음"],
+    "409": ["중복/충돌/참조로 인한 처리 불가"],
+    "412": ["조건/버전 불일치"],
+    "429": ["과도한 요청"],
+    "500": ["내부 처리 실패"]
+  }
+}
