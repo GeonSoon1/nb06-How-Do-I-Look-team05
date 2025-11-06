@@ -82,17 +82,19 @@ model Image {
 
 // 큐레이팅
 model Curation {
-  id               String           @id @default(uuid())
-  trendy           Int              @default(0)
-  personality      Int              @default(0)
-  practicality     Int              @default(0)
-  costEffectivness Int              @default(0)
-  content          String
-  nickName         String
-  password         String
-  style            Style            @relation(fields: [styleId], references: [id], onDelete: Cascade)
-  styleId          String
-  curationComment  CurationComment?
+  id                String           @id @default(uuid())
+  trendy            Int              @default(0)
+  personality       Int              @default(0)
+  practicality      Int              @default(0)
+  costEffectiveness Int              @default(0)
+  content           String
+  nickName          String
+  password          String
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  style             Style            @relation(fields: [styleId], references: [id], onDelete: Cascade)
+  styleId           String
+  curationComment   CurationComment?
 }
 
 // 덧글
