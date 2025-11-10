@@ -49,13 +49,13 @@ model Item {
 
 // 스타일 구성 카테고리
 enum Category {
-  TOPS
-  BOTTOMS
-  OUTERWEAR
-  DRESS
-  SHOES
-  BAGS
-  ACCESSORIES
+  top
+  bottom
+  outer
+  dress
+  shoes
+  bag
+  accessory
 }
 
 // 태그
