@@ -5,18 +5,54 @@
     "number": { "min": 0, "integer": true },
     "array": { "max": 50, "allowDuplicates": false },
     "id": { "type": "uuid|number" },
-    "datetime": { "format": "ISO8601", "timezone": "UTC" }
+    "datetime": { "format": "ISO8601", "timezone": "UTC" },
+    "fashion": {
+      "styleName": {
+        "min": 2,
+        "max": 30,
+        "pattern": "^[가-힣a-zA-Z0-9\\s]+$",
+        "unique": true
+      },
+      "description": { "min": 10, "max": 500 },
+      "hashtags": {
+        "max": 10,
+        "pattern": "^#[가-힣a-zA-Z0-9]+$",
+        "unique": true
+      },
+      "imageUrl": { "pattern": "^https?://.+\\.(jpg|jpeg|png|gif|webp)$" },
+      "season": { "enum": ["봄", "여름", "가을", "겨울", "사계절"] },
+      "style": {
+        "enum": [
+          "캐주얼",
+          "포멀",
+          "스트릿",
+          "빈티지",
+          "모던",
+          "클래식",
+          "스포티",
+          "로맨틱"
+        ]
+      }
+    }
   },
   "fields": {
-    "style.name": { "min": 2, "max": 50, "unique": true },
-    "curating.title": { "min": 1, "max": 100, "unique": true },
-    "curating.items": {
+    "outfit.title": { "min": 2, "max": 50, "unique": true },
+    "outfit.description": { "min": 10, "max": 500 },
+    "outfit.season": { "required": true },
+    "outfit.style": { "required": true },
+    "outfit.hashtags": { "max": 10 },
+    "outfit.images": { "minItems": 1, "maxItems": 10 },
+    "collection.title": { "min": 1, "max": 100, "unique": true },
+    "collection.description": { "min": 10, "max": 300 },
+    "collection.items": {
       "minItems": 1,
       "maxItems": 50,
       "uniqueItems": true,
       "itemType": "id"
     },
-    "comment.content": { "min": 1, "max": 1000, "profanityFilter": true }
+    "comment.content": { "min": 1, "max": 1000, "profanityFilter": true },
+    "user.nickname": { "min": 2, "max": 20, "unique": true },
+    "user.bio": { "max": 150 }
   },
   "commonErrors": [
     {
@@ -30,13 +66,13 @@
     }
   ],
   "httpMapping": {
-    "400": ["형식/유효성 오류", "잘못된 쿼리"],
-    "401": ["인증 필요"],
-    "403": ["권한 부족", "정책 위반"],
-    "404": ["리소스 없음"],
-    "409": ["중복/충돌/참조로 인한 처리 불가"],
-    "412": ["조건/버전 불일치"],
-    "429": ["과도한 요청"],
-    "500": ["내부 처리 실패"]
+    "400": ["형식/유효성 오류", "잘못된 쿼리", "패션 데이터 형식 오류"],
+    "401": ["인증 필요", "로그인이 필요합니다"],
+    "403": ["권한 부족", "정책 위반", "콘텐츠 접근 권한 없음"],
+    "404": ["리소스 없음", "패션 콘텐츠를 찾을 수 없습니다"],
+    "409": ["중복/충돌/참조로 인한 처리 불가", "이미 존재하는 스타일 이름"],
+    "412": ["조건/버전 불일치", "콘텐츠가 수정되었습니다"],
+    "429": ["과도한 요청", "업로드 제한 초과"],
+    "500": ["내부 처리 실패", "서버 오류"]
   }
 }

@@ -1,0 +1,77 @@
+{
+  "module": "tag",
+  "errors": [
+    {
+      "code": "TAG_INVALID_FORMAT",
+      "httpStatus": 400,
+      "message": "태그 형식이 올바르지 않습니다.",
+      "hint": "#으로 시작하는 한글, 영문, 숫자만 사용 가능합니다"
+    },
+    {
+      "code": "TAG_TOO_LONG",
+      "httpStatus": 400,
+      "message": "태그가 너무 깁니다.",
+      "hint": "태그는 최대 20자까지 가능합니다"
+    },
+    {
+      "code": "TAG_TOO_SHORT",
+      "httpStatus": 400,
+      "message": "태그가 너무 짧습니다.",
+      "hint": "태그는 최소 2자 이상이어야 합니다"
+    },
+    {
+      "code": "TAG_DUPLICATE",
+      "httpStatus": 400,
+      "message": "중복된 태그가 있습니다.",
+      "hint": "동일한 태그는 한 번만 사용할 수 있습니다"
+    },
+    {
+      "code": "TAG_MAX_LIMIT_EXCEEDED",
+      "httpStatus": 400,
+      "message": "태그 개수가 제한을 초과했습니다.",
+      "hint": "최대 10개의 태그만 사용할 수 있습니다"
+    },
+    {
+      "code": "TAG_NOT_FOUND",
+      "httpStatus": 404,
+      "message": "요청하신 태그를 찾을 수 없습니다."
+    },
+    {
+      "code": "TAG_CREATE_FAILED",
+      "httpStatus": 500,
+      "message": "태그 생성 중 오류가 발생했습니다."
+    },
+    {
+      "code": "TAG_UPDATE_FAILED",
+      "httpStatus": 500,
+      "message": "태그 수정 중 오류가 발생했습니다."
+    },
+    {
+      "code": "TAG_DELETE_FAILED",
+      "httpStatus": 500,
+      "message": "태그 삭제 중 오류가 발생했습니다."
+    },
+    {
+      "code": "TAG_IN_USE",
+      "httpStatus": 409,
+      "message": "사용 중인 태그는 삭제할 수 없습니다.",
+      "hint": "태그를 사용하는 콘텐츠를 먼저 수정해 주세요"
+    },
+    {
+      "code": "TAG_SEARCH_FAILED",
+      "httpStatus": 500,
+      "message": "태그 검색 중 오류가 발생했습니다."
+    },
+    {
+      "code": "TAG_INVALID_SEARCH_QUERY",
+      "httpStatus": 400,
+      "message": "태그 검색 쿼리가 올바르지 않습니다.",
+      "hint": "키워드를 입력해 주세요"
+    },
+    {
+      "code": "TAG_POPULARITY_CALC_FAILED",
+      "httpStatus": 500,
+      "message": "태그 인기도 계산 중 오류가 발생했습니다."
+    }
+  ]
+}
