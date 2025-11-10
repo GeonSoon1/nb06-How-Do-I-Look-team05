@@ -90,20 +90,11 @@ export const getStyles = async (req, res) => {
   };
 
   const reprocessing = () => {
-    const dbId = data.map((data) => data.id);
-    const dbImage = data.map((data) => data.images);
-    const dbTitle = data.map((data) => data.title);
-    const dbNickname = data.map((data) => data.nickName);
-    const dbTag = data.map((data) => data.tags);
-    const dbItem = data.map((data) => data.items);
-    const dbDescription = data.map((data) => data.description);
-    const dbViewCount = data.map((data) => data.viewCount);
-    const dbCurationCount = data.map((data) => data._count.curations);
-    const dbCreatedAt = data.map((data) => data.createdAt);
     const list = [];
     let thing = {};
-    for (let i = 0; i <= items.length - 1; i++) {
-      const category = dbItem[i].map((data) => ({
+
+    for (let i = 0; i <= data.length - 1; i++) {
+      const category = data[i]['items'].map((data) => ({
         [data.category]: { name: data.itemName, brand: data.brandName, price: data.price },
       }));
       const result = category.reduce((acc, item) => {
@@ -111,18 +102,17 @@ export const getStyles = async (req, res) => {
         acc[key] = value;
         return acc;
       }, {});
-
       thing = {
-        id: dbId[i],
-        thumbnail: dbImage[i][0]['url'],
-        title: dbTitle[i],
-        nickname: dbNickname[i],
-        tags: dbTag[i].map((data) => data.tag),
+        id: data[i]['id'],
+        thumbnail: data[i]['images'][0]['url'],
+        title: data[i]['title'],
+        nickname: data[i]['nickName'],
+        tags: data[i]['tags'].map((data) => data.tag),
         categories: result,
-        content: dbDescription[i],
-        viewCount: dbViewCount[i],
-        curationCount: dbCurationCount[i],
-        createdAt: dbCreatedAt[i],
+        content: data[i]['description'],
+        viewCount: data[i]['viewCount'],
+        curationCount: data[i]['_count']['curations'],
+        createdAt: data[i]['createdAt'],
       };
       list.push(thing);
     }
