@@ -54,7 +54,7 @@ export const getStyles = async (req, res) => {
     where: { ...where, ...stylesOfTag },
     // 정렬 옵션
     orderBy,
-    //페이지 네이션 옵션
+    //페이지네이션 옵션
     cursor: {
       id: firstStyleId(firstStyle),
     },
@@ -124,6 +124,52 @@ export const getStyles = async (req, res) => {
     totalPages: data.length,
     totalItemCount: getItemCount(),
     data: reprocessing(),
+  };
+
+  res.status(200).send(response);
+};
+
+//스타일 상제 조회
+export const getStyleDetail = async (req, res) => {
+  const { id } = req.params;
+  const style = await prisma.style.findUniqueOrThrow({
+    where: { id },
+    select: {
+      id: true,
+      nickName: true,
+      title: true,
+      description: true,
+      viewCount: true,
+      createdAt: true,
+      _count: { select: { curations: true } },
+      items: { select: { itemName: true, brandName: true, price: true, category: true } },
+      tags: { select: { tag: true } },
+      images: { select: { url: true } },
+    },
+  });
+  //리스폰스------------------
+  const data = style;
+
+  const categories = data['items'].map((item) => ({
+    [item.category]: { name: item.itemName, brand: item.brandName, price: item.price },
+  }));
+  const spread = categories.reduce((acc, item) => {
+    const [key, value] = Object.entries(item)[0]; // 객체의 키-값 한 쌍 꺼내기
+    acc[key] = value;
+    return acc;
+  }, {});
+
+  const response = {
+    id: data['id'],
+    nickName: data['nickName'],
+    title: data['title'],
+    content: data['description'],
+    viewCount: data['viewCount'],
+    curationCount: data['_count']['curations'],
+    createdAt: data['createdAt'],
+    categories: spread,
+    tag: data['tags'].map((tags) => tags.tag),
+    imageUrls: data['images'].map((images) => images.url),
   };
 
   res.status(200).send(response);
