@@ -48,10 +48,13 @@ export const getStyles = async (req, res) => {
   } else {
     where = { id: undefined };
   }
-  const stylesOfTag = tag ? { tags: { tag: tag } } : undefined;
+
+  if (tag) {
+    where = { tags: { some: { tag: tag } } };
+  }
   const styles = await prisma.style.findMany({
     //검색옵션
-    where: { ...where, ...stylesOfTag },
+    where,
     // 정렬 옵션
     orderBy,
     //페이지네이션 옵션
@@ -78,7 +81,7 @@ export const getStyles = async (req, res) => {
     },
   });
 
-  //리스폰스----------------------------------------------------------------------
+  //리스폰스--------
   const data = styles;
   const items = data.map((data) => data.items);
   const getItemCount = () => {
