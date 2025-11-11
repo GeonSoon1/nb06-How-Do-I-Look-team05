@@ -161,7 +161,7 @@ export const getStyleDetail = async (req, res) => {
 
   const response = {
     id: data['id'],
-    nickName: data['nickName'],
+    nickname: data['nickName'],
     title: data['title'],
     content: data['description'],
     viewCount: data['viewCount'],
