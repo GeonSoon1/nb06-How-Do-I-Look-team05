@@ -1,0 +1,48 @@
+GET http://localhost:3000/styles
+
+###
+POST http://localhost:3000/styles
+Content-Type: application/json
+
+{
+	"nickName": "꽃동이",
+	"title": "투모로우바이투게더 수빈 발렌티노 쇼 참석",
+	"description": "이 밖에도 푸마, 커버낫, 뉴발란스, 트릴리온, 디미트리블랙이 각각 10위부터 6위까지 순위에 들며 저력을 입증했다. 10월 핫 브랜드의 쇼핑 데이터를 참고해 올겨울 트렌디한 나만의 착장을 꾸려 보는 건 어떨까?",
+	"password": "1234",
+  "trendyAverage": "0",
+  "uniqueAverage": "0",
+  "practicalAverage": "0",
+  "costEffectiveAverage": "0",
+  "totalAverage": "0",
+  "viewCount": 0,
+  "curationCount": 0, // <- 추가
+	"categories": {
+		"top": {
+			"name": "웃도리",
+			"brand": "동대문",
+			"price": 1000
+		},
+    "bottom": {
+			"name": "청바지",
+			"brand": "남대문",
+			"price": 3000
+		},
+    "outer": {
+			"name": "가죽잠바",
+			"brand": "평화시장",
+			"price": 29000
+		}
+	},
+	"tags": [
+		"아디다스",
+		"동대문",
+    "보세"
+	],
+	"imageUrls": [
+		"/test/test.jpg",
+		"/test/test2.jpg",
+    "/test/test3.jpg"
+	]
+}
+
+
