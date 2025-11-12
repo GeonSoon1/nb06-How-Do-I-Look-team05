@@ -1,3 +1,8 @@
 import express from 'express';
+import { getTags } from '../controllers/tagsControllers.js';
 
-// const <> = express.Router();
+const tagsRouter = express.Router();
+
+tagsRouter.route('/').get(getTags);
+
+export default tagsRouter;
