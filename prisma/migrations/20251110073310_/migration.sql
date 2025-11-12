@@ -1,12 +1,18 @@
 -- CreateEnum
-CREATE TYPE "Category" AS ENUM ('TOPS', 'BOTTOMS', 'OUTERWEAR', 'DRESS', 'SHOES', 'BAGS', 'ACCESSORIES');
+CREATE TYPE "Category" AS ENUM ('top', 'bottom', 'outer', 'dress', 'shoes', 'bag', 'accessory');
 
 -- CreateTable
 CREATE TABLE "Style" (
     "id" TEXT NOT NULL,
+    "nickName" TEXT NOT NULL,
     "title" TEXT NOT NULL,
     "description" TEXT,
     "password" TEXT NOT NULL,
+    "trendyAverage" DECIMAL(65,30) NOT NULL DEFAULT 0.0,
+    "uniqueAverage" DECIMAL(65,30) NOT NULL DEFAULT 0.0,
+    "practicalAverage" DECIMAL(65,30) NOT NULL DEFAULT 0.0,
+    "costEffectiveAverage" DECIMAL(65,30) NOT NULL DEFAULT 0.0,
+    "totalAverage" DECIMAL(65,30) NOT NULL DEFAULT 0.0,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "viewCount" INTEGER NOT NULL DEFAULT 0,
@@ -30,7 +36,8 @@ CREATE TABLE "Item" (
 CREATE TABLE "Tag" (
     "id" TEXT NOT NULL,
     "tag" TEXT NOT NULL,
-    "lookbookCount" INTEGER NOT NULL DEFAULT 0,
+    "styleCount" INTEGER NOT NULL DEFAULT 0,
+    "clickCount" INTEGER NOT NULL DEFAULT 0,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -53,13 +60,14 @@ CREATE TABLE "Image" (
 CREATE TABLE "Curation" (
     "id" TEXT NOT NULL,
     "trendy" INTEGER NOT NULL DEFAULT 0,
-    "unique" INTEGER NOT NULL DEFAULT 0,
-    "practical" INTEGER NOT NULL DEFAULT 0,
-    "costEffective" INTEGER NOT NULL DEFAULT 0,
-    "average" DECIMAL(65,30) NOT NULL DEFAULT 0.0,
+    "personality" INTEGER NOT NULL DEFAULT 0,
+    "practicality" INTEGER NOT NULL DEFAULT 0,
+    "costEffectiveness" INTEGER NOT NULL DEFAULT 0,
     "content" TEXT NOT NULL,
     "nickName" TEXT NOT NULL,
     "password" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
     "styleId" TEXT NOT NULL,
 
     CONSTRAINT "Curation_pkey" PRIMARY KEY ("id")

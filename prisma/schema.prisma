@@ -28,6 +28,7 @@ model Style {
   createdAt            DateTime   @default(now())
   updatedAt            DateTime   @updatedAt
   viewCount            Int        @default(0)
+  curationCount        Int        @default(0) // <- 상운: API 명세서 다시 확인해보니 response에 이 항목이 있었네요.
   tags                 Tag[]
   images               Image[]
   items                Item[]

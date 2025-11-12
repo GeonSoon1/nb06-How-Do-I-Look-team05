@@ -1,24 +1,27 @@
 {
   "dependencies": {
-    "@prisma/client": "^5.4.2",
+    "@prisma/client": "^5.22.0",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "express": "^4.19.2",
     "express-async-errors": "^3.1.1",
     "is-email": "^1.0.2",
     "is-uuid": "^1.0.2",
-    "prisma": "^5.4.2",
-    "superstruct": "^1.0.3",
-    "multer": "^2.0.2"
+    "multer": "^2.0.2",
+    "prisma": "^5.22.0",
+    "superstruct": "^1.0.3"
   },
   "devDependencies": {
     "@faker-js/faker": "^10.1.0",
+    "eslint": "^9.39.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
     "nodemon": "^3.0.1"
   },
   "type": "module",
   "scripts": {
-    "dev": "nodemon src/app.js",
-    "start": "node app.js"
+    "dev": "clear; nodemon src/app.js",
+    "start": "clear; node app.js"
   },
   "prisma": {
     "seed": "node prisma/seed.js"
