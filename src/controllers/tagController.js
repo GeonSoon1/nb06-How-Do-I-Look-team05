@@ -12,13 +12,15 @@ export const getStyles = async (req, res) => {
     mostCurated: [{ curations: { _count: 'desc' } }, { viewCount: 'desc' }]
   };
   // 커서 필터
-  const sortLast = {
-    latest: { createdAt: 'asc' },
-    mostViewed: { viewCount: 'asc' },
-    mostCurated: [{ curations: { _count: 'asc' } }, { viewCount: 'asc' }]
-  };
+  // const sortLast = {
+  //   latest: { createdAt: 'asc' },
+  //   mostViewed: { viewCount: 'asc' },
+  //   mostCurated: [{ curations: { _count: 'asc' } }, { viewCount: 'asc' }]
+  // };
   const lastStyles = await prisma.style.findFirst({
-    orderBy: sortLast[sortBy] || sortLast['latest']
+    orderBy: sortOption[sortBy] || sortOption['latest'],
+    skip: page === '1' ? parseInt(pageSize) : parseInt(pageSize) * parseInt(page) - 1,
+    take: 1
   });
   const cursor = page === '1' ? undefined : { id: lastStyles.id };
   const skip = page === '1' ? 0 : 1;
