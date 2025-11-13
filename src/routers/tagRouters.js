@@ -1,5 +1,5 @@
 import express from 'express';
-import { getStyleDetail, getStyles } from '../controllers/stylesControllers.js';
+import { getStyleDetail, getStyles } from '../controllers/tagController.js';
 
 const stylesRouter = express.Router();
 
