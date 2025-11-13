@@ -1,0 +1,110 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// 스타일
+model Style {
+  id                   String     @id @default(uuid())
+  nickName             String
+  title                String
+  description          String?
+  password             String
+  trendyAverage        Decimal    @default(0.0)
+  uniqueAverage        Decimal    @default(0.0)
+  practicalAverage     Decimal    @default(0.0)
+  costEffectiveAverage Decimal    @default(0.0)
+  totalAverage         Decimal    @default(0.0)
+  createdAt            DateTime   @default(now())
+  updatedAt            DateTime   @updatedAt
+  viewCount            Int        @default(0)
+  curationCount        Int        @default(0) // <- 상운: API 명세서 다시 확인해보니 response에 이 항목이 있었네요.
+  tags                 Tag[]
+  images               Image[]
+  items                Item[]
+  curations            Curation[]
+
+  @@index([title, description])
+}
+
+// 스타일 구성 아이템
+model Item {
+  id        String   @id @default(uuid())
+  itemName  String
+  brandName String
+  price     Decimal  @default(0.0)
+  category  Category
+  style     Style    @relation(fields: [styleId], references: [id], onDelete: Cascade)
+  styleId   String
+}
+
+// 스타일 구성 카테고리
+enum Category {
+  top
+  bottom
+  outer
+  dress
+  shoes
+  bag
+  accessory
+}
+
+// 태그
+model Tag {
+  id         String   @id @default(uuid())
+  tag        String   @unique
+  styleCount Int      @default(0) // <-태그당 룩북수
+  clickCount Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  styles     Style[]
+}
+
+// 이미지
+model Image {
+  id          String   @id @default(uuid())
+  url         String // 이미지 파일 경로 또는 URL
+  isThumbnail Boolean  @default(false) // 대표이미지 설정
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  style       Style    @relation(fields: [styleId], references: [id], onDelete: Cascade)
+  styleId     String
+}
+
+// 큐레이팅
+model Curation {
+  id                String           @id @default(uuid())
+  trendy            Int              @default(0)
+  personality       Int              @default(0)
+  practicality      Int              @default(0)
+  costEffectiveness Int              @default(0)
+  content           String
+  nickName          String
+  password          String
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  style             Style            @relation(fields: [styleId], references: [id], onDelete: Cascade)
+  styleId           String
+  curationComment   CurationComment?
+}
+
+// 덧글
+model CurationComment {
+  id         String   @id @default(uuid())
+  content    String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  password   String
+  curation   Curation @relation(fields: [curationId], references: [id], onDelete: Cascade)
+  curationId String   @unique
+}

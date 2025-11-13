@@ -1,4 +1,5 @@
 node_modules/
-dist/
+__http__/
+.vscode/
 .env
-.DS_Store
+seed.js
