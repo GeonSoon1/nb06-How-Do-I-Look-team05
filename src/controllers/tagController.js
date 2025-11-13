@@ -4,71 +4,36 @@ import { response } from 'express';
 import { object } from 'superstruct';
 
 export const getStyles = async (req, res) => {
-  const { page = '1', pageSize = 12, sortBy, searchBy, keyword, tag } = req.query;
-
-  let orderBy; // 정렬 필터
-  switch (sortBy) {
-    case 'latest':
-      orderBy = { createdAt: 'desc' };
-      break;
-    case 'mostViewed':
-      orderBy = { viewCount: 'desc' };
-      break;
-    case 'mostCurated':
-      orderBy = { curations: { _count: 'desc' } };
-      break;
-    default: //기본값
-      orderBy = { createdAt: 'desc' };
-      break;
-  }
-
-  let id; //커서 기능 필터
-  const firstStyle = await prisma.style.findFirst({
-    orderBy,
-  });
-  function firstStyleId(style) {
-    return (id = style.id);
-  }
-  let skip;
-  if (page === '1') {
-    skip = 0;
-  } else {
-    skip = 1;
-  }
-
-  let where; // 검색 조건 필터
-  if (searchBy === 'nickname') {
-    where = { nickName: { contains: keyword } };
-  } else if (searchBy === 'title') {
-    where = { title: { contains: keyword } };
-  } else if (searchBy === 'content') {
-    where = { description: { contains: keyword } };
-  } else if (searchBy === 'tag') {
-    where = { tags: { some: { tag: { contains: keyword } } } };
-  } else {
-    where = { id: undefined };
-  }
-
+  const { page = '1', pageSize = '12', sortBy, searchBy, keyword, tag } = req.query;
+  // 정렬 필터
+  const sortOption = {
+    latest: { createdAt: 'desc' },
+    mostViewed: { viewCount: 'desc' },
+    mostCurated: [{ curations: { _count: 'desc' } }, { viewCount: 'desc' }]
+  };
+  //검색 필터
+  const searchOprion = {
+    nickname: { nickName: { contains: keyword } },
+    title: { title: { contains: keyword } },
+    content: { description: { contains: keyword } },
+    tag: { tags: { some: { tag: { contains: keyword } } } }
+  };
+  //태그로 조회
   if (tag) {
     where = { tags: { some: { tag: tag } } };
   }
+
   const styles = await prisma.style.findMany({
-    //검색옵션
-    where,
-    // 정렬 옵션
-    orderBy,
-    //페이지네이션 옵션
-    cursor: {
-      id: firstStyleId(firstStyle),
-    },
-    skip,
+    where: searchOprion[searchBy] || undefined,
+    orderBy: sortOption[sortBy] || sortOption['latest'],
+    skip: (parseInt(page) - 1) * parseInt(pageSize),
     take: parseInt(pageSize),
     // 표시 정보
     select: {
       id: true,
       images: {
         where: { isThumbnail: true },
-        select: { url: true },
+        select: { url: true }
       },
       title: true,
       nickName: true,
@@ -77,8 +42,8 @@ export const getStyles = async (req, res) => {
       description: true,
       viewCount: true,
       _count: { select: { curations: true } },
-      createdAt: true,
-    },
+      createdAt: true
+    }
   });
 
   //리스폰스--------
@@ -98,7 +63,7 @@ export const getStyles = async (req, res) => {
 
     for (let i = 0; i <= data.length - 1; i++) {
       const category = data[i]['items'].map((data) => ({
-        [data.category]: { name: data.itemName, brand: data.brandName, price: data.price },
+        [data.category]: { name: data.itemName, brand: data.brandName, price: data.price }
       }));
       const result = category.reduce((acc, item) => {
         const [key, value] = Object.entries(item)[0]; // 객체의 키-값 한 쌍 꺼내기
@@ -115,7 +80,7 @@ export const getStyles = async (req, res) => {
         content: data[i]['description'],
         viewCount: data[i]['viewCount'],
         curationCount: data[i]['_count']['curations'],
-        createdAt: data[i]['createdAt'],
+        createdAt: data[i]['createdAt']
       };
       list.push(thing);
     }
@@ -126,7 +91,7 @@ export const getStyles = async (req, res) => {
     currentPage: page,
     totalPages: data.length,
     totalItemCount: getItemCount(),
-    data: reprocessing(),
+    data: reprocessing()
   };
 
   res.status(200).send(response);
@@ -147,14 +112,14 @@ export const getStyleDetail = async (req, res) => {
       _count: { select: { curations: true } },
       items: { select: { itemName: true, brandName: true, price: true, category: true } },
       tags: { select: { tag: true } },
-      images: { select: { url: true } },
-    },
+      images: { select: { url: true } }
+    }
   });
   //리스폰스------------------
   const data = style;
 
   const categories = data['items'].map((item) => ({
-    [item.category]: { name: item.itemName, brand: item.brandName, price: item.price },
+    [item.category]: { name: item.itemName, brand: item.brandName, price: item.price }
   }));
   const spread = categories.reduce((acc, item) => {
     const [key, value] = Object.entries(item)[0]; // 객체의 키-값 한 쌍 꺼내기
@@ -172,7 +137,7 @@ export const getStyleDetail = async (req, res) => {
     createdAt: data['createdAt'],
     categories: spread,
     tag: data['tags'].map((tags) => tags.tag),
-    imageUrls: data['images'].map((images) => images.url),
+    imageUrls: data['images'].map((images) => images.url)
   };
 
   res.status(200).send(response);
