@@ -12,4 +12,5 @@ app.use('/curations', curationRouter);
 
 app.use('/styles', styleRouter);
 
-app.listen(PORT || 3000, () => console.log('server started'));
+// listener
+app.listen(PORT || 3000, () => console.log(`Server listening on port ${PORT}!`));
