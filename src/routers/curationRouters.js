@@ -1,5 +1,5 @@
 import express from 'express';
-import { updateCuration, deleteCuration } from '../structs/curationStructs.js';
+import { updateCuration, deleteCuration } from '../controllers/curationController.js';
 
 const curationRouter = express.Router()
 
