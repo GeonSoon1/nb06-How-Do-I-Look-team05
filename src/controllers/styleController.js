@@ -28,3 +28,7 @@ export const createStyle = async (req, res) => {
   });
   res.status(201).json(newStyle);
 };
+
+export const patchStyle = async (req, res) => {
+  const processedData = req.body;
+};
