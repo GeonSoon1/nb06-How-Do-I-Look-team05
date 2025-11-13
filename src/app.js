@@ -7,10 +7,9 @@ import curationRouter from './routers/curationRouters.js';
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use('/styles', styleRouter);
 
 app.use('/curations', curationRouter);
-
-app.use('/styles', styleRouter);
 
 // listener
 app.listen(PORT || 3000, () => console.log(`Server listening on port ${PORT}!`));

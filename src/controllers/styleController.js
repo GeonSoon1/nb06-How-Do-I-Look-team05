@@ -33,8 +33,8 @@ export const createStyle = async (req, res) => {
 // style 수정
 export const patchStyle = async (req, res, next) => {
   try {
-    const { styleId } = req.params;
-    const { nickName, title, description, password, tags, items } = req.body;
+    const styleId = Number(req.params.styleId);
+    const { nickname, title, content, password, tags, items } = req.body;
 
     const originalStyle = await prisma.style.findUnique({
       where: { id: styleId }
@@ -57,9 +57,9 @@ export const patchStyle = async (req, res, next) => {
 
     const updatedStyle = await prisma.$transaction(async (tx) => {
       const styleUpdateData = {};
-      if (nickName) styleUpdateData.nickName = nickName;
+      if (nickname) styleUpdateData.nickname = nickname;
       if (title) styleUpdateData.title = title;
-      if (description !== undefined) styleUpdateData.description = description;
+      if (content !== undefined) styleUpdateData.content = content;
 
       await tx.style.update({
         where: { id: styleId },
@@ -117,6 +117,20 @@ export const patchStyle = async (req, res, next) => {
       });
     });
     res.status(200).json(updatedStyle);
+  } catch (err) {
+    next(err);
+  }
+};
+
+// 삭제
+export const deleteStyle = async (req, res, next) => {
+  try {
+    const styleId = Number(req.params.styleId);
+    const delStyle = await prisma.style.delete({
+      where: { id: styleId }
+    });
+    console.log('삭제완료');
+    res.status(200).send(delStyle);
   } catch (err) {
     next(err);
   }
