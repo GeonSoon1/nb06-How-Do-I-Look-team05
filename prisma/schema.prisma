@@ -15,10 +15,10 @@ datasource db {
 
 // 스타일
 model Style {
-  id                   String     @id @default(uuid())
-  nickName             String
+  id                   Int        @id @default(autoincrement())
+  nickname             String
   title                String
-  description          String?
+  content              String?
   password             String
   trendyAverage        Decimal    @default(0.0)
   uniqueAverage        Decimal    @default(0.0)
@@ -34,18 +34,18 @@ model Style {
   items                Item[]
   curations            Curation[]
 
-  @@index([title, description])
+  @@index([title, content])
 }
 
 // 스타일 구성 아이템
 model Item {
-  id        String   @id @default(uuid())
+  id        Int      @id @default(autoincrement())
   itemName  String
   brandName String
   price     Decimal  @default(0.0)
   category  Category
   style     Style    @relation(fields: [styleId], references: [id], onDelete: Cascade)
-  styleId   String
+  styleId   Int
 }
 
 // 스타일 구성 카테고리
@@ -61,7 +61,7 @@ enum Category {
 
 // 태그
 model Tag {
-  id         String   @id @default(uuid())
+  id         Int      @id @default(autoincrement())
   tag        String   @unique
   styleCount Int      @default(0) // <-태그당 룩북수
   clickCount Int      @default(0)
@@ -72,39 +72,39 @@ model Tag {
 
 // 이미지
 model Image {
-  id          String   @id @default(uuid())
+  id          Int      @id @default(autoincrement())
   url         String // 이미지 파일 경로 또는 URL
   isThumbnail Boolean  @default(false) // 대표이미지 설정
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   style       Style    @relation(fields: [styleId], references: [id], onDelete: Cascade)
-  styleId     String
+  styleId     Int
 }
 
 // 큐레이팅
 model Curation {
-  id                String           @id @default(uuid())
+  id                Int              @id @default(autoincrement())
   trendy            Int              @default(0)
   personality       Int              @default(0)
   practicality      Int              @default(0)
   costEffectiveness Int              @default(0)
   content           String
-  nickName          String
+  nickname          String
   password          String
   createdAt         DateTime         @default(now())
   updatedAt         DateTime         @updatedAt
   style             Style            @relation(fields: [styleId], references: [id], onDelete: Cascade)
-  styleId           String
+  styleId           Int
   curationComment   CurationComment?
 }
 
 // 덧글
 model CurationComment {
-  id         String   @id @default(uuid())
+  id         Int      @id @default(autoincrement())
   content    String
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
   password   String
   curation   Curation @relation(fields: [curationId], references: [id], onDelete: Cascade)
-  curationId String   @unique
+  curationId Int      @unique
 }

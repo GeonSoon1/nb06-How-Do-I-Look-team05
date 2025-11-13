@@ -27,7 +27,7 @@ async function main() {
     '레트로',
     '클래식',
     '청량감',
-    '자연스러움',
+    '자연스러움'
   ];
 
   const titlePool = [
@@ -43,7 +43,7 @@ async function main() {
     '투바투 태현이 착용한 칼린 가방',
     '버버리 아트스페이스 손석구형',
     '손동표 도산공원 산책 룩',
-    '이종석 X 에스.티.듀퐁 WWD 화보',
+    '이종석 X 에스.티.듀퐁 WWD 화보'
   ];
 
   const descriptionPool = [
@@ -61,7 +61,7 @@ async function main() {
     '이 밖에도 푸마, 커버낫, 뉴발란스, 트릴리온, 디미트리블랙이 각각 10위부터 6위까지 순위에 들며 저력을 입증했다. 10월 핫 브랜드의 쇼핑 데이터를 참고해 올겨울 트렌디한 나만의 착장을 꾸려 보는 건 어떨까? ',
     '1964년 설립된 나이키(NIKE)는 다양한 컬래버레이션과 두터운 마니아층들로 그 위치를 증명하는 브랜드입니다. 자신의 한계를 뛰어넘는 스포츠 정신이 바로 나이키 브랜드를 상징하며, 실패를 두려워하지 말라는 메시지는 많은 사람들에게 긍정적인 희망을 주어 나이키의 핵심 가치이자 철학으로 자리매김했습니다. 나이키는 운동 선수들의 목소리에 귀를 기울이고, 그들이 최고의 기량을 발휘할 수 있도록 돕는 제품을 생산합니다. 세계적인 발자취, 혁신 문화와 팀 우선 정신을 바탕으로 전 세계를 위한 끊임없는 스포츠의 미래를 창조하고 있습니다',
     '스포츠 라이프스타일은 라커룸 밖에서도 계속됩니다. 1920년부터 독일의 헤르초게나우라흐에서 스포츠 슈즈를 만들던 아디다스(ADIDAS)는 이러한 철학을 토대로 경기장에서부터 거리에 이르기까지 모두가 즐길 수 있는 스포츠 라이프스타일의 개념을 처음으로 도입한 브랜드입니다. 스포츠 영역의 다양한 요소를 일상의 영역으로 가져오는 아디다스는 이를 통해 전 세계의 트렌드를 주도하고 있으며, 지금도 여전히 자신의 다양한 모습을 보여주고 싶어하는 소비자와 직접 소통하며 함께 혁신적인 트렌드를 만들고 있습니다.',
-    '노스페이스(THE NORTH FACE)는 브랜드 고유의 디자인 과학과 기술 혁신을 통해 인간이 자연과의 더 나은 공존을 경험할 수 있도록 지원해오고 있으며, 브랜드 모토인 끊임없는 탐험(Never Stop Exploring)을 실천하여 탐험과 도전을 통해 나아가는 브랜드입니다.',
+    '노스페이스(THE NORTH FACE)는 브랜드 고유의 디자인 과학과 기술 혁신을 통해 인간이 자연과의 더 나은 공존을 경험할 수 있도록 지원해오고 있으며, 브랜드 모토인 끊임없는 탐험(Never Stop Exploring)을 실천하여 탐험과 도전을 통해 나아가는 브랜드입니다.'
   ];
 
   const commentPool = [
@@ -99,7 +99,7 @@ async function main() {
     '봄나들이 룩으로 딱이네요. 저장합니다!',
     '결혼식 하객룩으로도 손색없을 것 같아요.',
     '편안해 보이면서 스타일까지 잡았네요. 대박!',
-    '이 조합은 생각도 못 했는데... 센스 미쳤다!',
+    '이 조합은 생각도 못 했는데... 센스 미쳤다!'
   ];
 
   const brandPool = [
@@ -149,7 +149,7 @@ async function main() {
     '반스',
     '컨버스',
     '살로몬',
-    '룰루레몬',
+    '룰루레몬'
   ];
 
   const itemPool = [
@@ -191,7 +191,7 @@ async function main() {
     '비니',
     '에코백',
     '레더 크로스백',
-    '뿔테 안경',
+    '뿔테 안경'
   ];
 
   const uniqueTags = new Set();
@@ -205,19 +205,19 @@ async function main() {
         data: {
           tag,
           styleCount: faker.number.int({ min: 0, max: 200 }),
-          clickCount: faker.number.int({ min: 0, max: 1000 }),
-        },
-      }),
-    ),
+          clickCount: faker.number.int({ min: 0, max: 1000 })
+        }
+      })
+    )
   );
 
   // 2. 스타일 100개 생성
   for (let i = 0; i < 100; i++) {
     const style = await prisma.style.create({
       data: {
-        nickName: faker.animal.petName({ min: 2, max: 10 }),
+        nickname: faker.animal.petName({ min: 2, max: 10 }),
         title: faker.helpers.arrayElement(titlePool),
-        description: faker.helpers.arrayElement(descriptionPool),
+        content: faker.helpers.arrayElement(descriptionPool),
         password: faker.number.int({ min: 1000, max: 9999 }).toString(),
         trendyAverage: faker.number.float({ min: 1, max: 10 }).toFixed(1),
         uniqueAverage: faker.number.float({ min: 1, max: 10 }).toFixed(1),
@@ -230,7 +230,7 @@ async function main() {
         tags: {
           connect: faker.helpers
             .arrayElements(tags, faker.number.int({ min: 1, max: 4 }))
-            .map((tag) => ({ id: tag.id })),
+            .map((tag) => ({ id: tag.id }))
         },
 
         // 이미지
@@ -238,13 +238,13 @@ async function main() {
           create: [
             {
               url: faker.image.urlPicsumPhotos({ width: 680, height: 960 }),
-              isThumbnail: true,
+              isThumbnail: true
             },
             ...Array.from({ length: faker.number.int({ min: 1, max: 5 }) }).map(() => ({
               url: faker.image.urlPicsumPhotos({ width: 680, height: 960 }),
-              isThumbnail: false,
-            })),
-          ],
+              isThumbnail: false
+            }))
+          ]
         },
 
         // 아이템
@@ -260,9 +260,9 @@ async function main() {
               'dress',
               'shoes',
               'bag',
-              'accessory',
-            ]),
-          })),
+              'accessory'
+            ])
+          }))
         },
 
         // 큐레이션
@@ -273,19 +273,19 @@ async function main() {
             practicality: faker.number.int({ min: 1, max: 10 }),
             costEffectiveness: faker.number.int({ min: 1, max: 10 }),
             content: faker.lorem.paragraphs({ min: 1, max: 2 }),
-            nickName: faker.animal.petName({ min: 2, max: 10 }),
+            nickname: faker.animal.petName({ min: 2, max: 10 }),
             password: faker.number.int({ min: 1000, max: 9999 }).toString(),
             curationComment: faker.datatype.boolean()
               ? {
                   create: {
                     content: faker.helpers.arrayElement(commentPool),
-                    password: faker.number.int({ min: 1000, max: 9999 }).toString(),
-                  },
+                    password: faker.number.int({ min: 1000, max: 9999 }).toString()
+                  }
                 }
-              : undefined,
-          })),
-        },
-      },
+              : undefined
+          }))
+        }
+      }
     });
 
     console.log(`스타일 생성 완료 (${i + 1}/100): ${style.title}`);
