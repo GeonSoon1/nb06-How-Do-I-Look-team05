@@ -4,26 +4,13 @@ import { response } from 'express';
 import { object } from 'superstruct';
 
 export const getStyles = async (req, res) => {
-  const { page = '1', pageSize = 12, sortBy, searchBy, keyword, tag } = req.query;
+  const { page = '1', pageSize = '12', sortBy, searchBy, keyword, tag } = req.query;
   // 정렬 필터
   const sortOption = {
     latest: { createdAt: 'desc' },
     mostViewed: { viewCount: 'desc' },
     mostCurated: [{ curations: { _count: 'desc' } }, { viewCount: 'desc' }]
   };
-  // 커서 필터
-  // const sortLast = {
-  //   latest: { createdAt: 'asc' },
-  //   mostViewed: { viewCount: 'asc' },
-  //   mostCurated: [{ curations: { _count: 'asc' } }, { viewCount: 'asc' }]
-  // };
-  const lastStyles = await prisma.style.findFirst({
-    orderBy: sortOption[sortBy] || sortOption['latest'],
-    skip: page === '1' ? parseInt(pageSize) : parseInt(pageSize) * parseInt(page) - 1,
-    take: 1
-  });
-  const cursor = page === '1' ? undefined : { id: lastStyles.id };
-  const skip = page === '1' ? 0 : 1;
   //검색 필터
   const searchOprion = {
     nickname: { nickName: { contains: keyword } },
@@ -37,13 +24,9 @@ export const getStyles = async (req, res) => {
   }
 
   const styles = await prisma.style.findMany({
-    //검색옵션
     where: searchOprion[searchBy] || undefined,
-    // 정렬 옵션
     orderBy: sortOption[sortBy] || sortOption['latest'],
-    //페이지네이션 옵션
-    cursor,
-    skip,
+    skip: (parseInt(page) - 1) * parseInt(pageSize),
     take: parseInt(pageSize),
     // 표시 정보
     select: {
