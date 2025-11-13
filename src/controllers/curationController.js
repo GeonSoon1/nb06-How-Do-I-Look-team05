@@ -25,7 +25,7 @@ export const createStyleCuration = async(req, res) => {
     },
     select: {
       id: true,
-      nickname: true,
+      nickName: true,
       content: true,
       trendy: true,
       personality: true,
@@ -67,7 +67,7 @@ export const updateCuration = async(req, res) => {
     data,
     select: {
       id: true,
-      nickname: true,
+      nickName: true,
       content: true,
       trendy: true,
       personality: true,

@@ -13,4 +13,9 @@ app.use('/curations', curationRouter);
 app.use('/styles', styleRouter);
 
 // listener
+<<<<<<< HEAD
 app.listen(PORT || 3000, () => console.log(`Server listening on port ${PORT}!`));
+=======
+// app.listen(PORT || 3000, () => console.log(`Server listening on port ${PORT}!`));
+app.listen(3000, () => console.log("server Start"))
+>>>>>>> 404c748 (조금 수정중)
