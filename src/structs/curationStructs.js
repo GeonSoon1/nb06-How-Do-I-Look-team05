@@ -1,7 +1,7 @@
 import * as s from 'superstruct';
 
 export const CreateCuration = s.object({
-  nickName: s.size(s.string(), 1, 10),
+  nickname: s.size(s.string(), 1, 10),
   content: s.string(),
   password: s.size(s.string(), 1, 10),
   trendy: s.max(s.min(s.integer(), 0), 10),
@@ -12,11 +12,7 @@ export const CreateCuration = s.object({
 
 
 export const PatchCuration = s.object({
-<<<<<<< HEAD
   nickname: s.size(s.string(), 1, 10),
-=======
-  nickName: s.size(s.string(), 1, 10),
->>>>>>> 404c748 (조금 수정중)
   content: s.string(),
   password: s.size(s.string(), 1, 10),
   trendy: s.max(s.min(s.integer(), 0), 10),
