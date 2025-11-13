@@ -6,7 +6,7 @@ import { assert } from 'superstruct'
 // 큐레이팅 등록 http://localhost:3000/styles/{styleId}/curations
 export const createStyleCuration = async(req, res) => {
   assert(req.body, CreateCuration)
-  const { styleId } = req.params
+  const styleId = parseInt(req.params.styleId, 10)
   const curationData = req.body;
 
   // styleId에 해당하는 style이 있는지 확인
@@ -45,7 +45,7 @@ export const createStyleCuration = async(req, res) => {
 export const updateCuration = async(req, res) => {
   //structError 400 Bad Request 처리 핸들러 필요.
   assert(req.body, PatchCuration)
-  const { curationId } = req.params
+  const curationId  = parseInt(req.params.curationId, 10);
   const data = req.body
   
   // 존재 여부
@@ -83,7 +83,7 @@ export const updateCuration = async(req, res) => {
 // 큐레이팅 삭제 http://localhost:3000/curations/{curationId}
 export const deleteCuration = async(req, res) => {
   assert(req.body, DeleteCuration)
-  const { curationId } = req.params
+  const curationId  = parseInt(req.params.curationId, 10)
   const data = req.body
 
   // 존재 여부 확인
