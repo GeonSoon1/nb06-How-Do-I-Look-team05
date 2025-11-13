@@ -1,9 +1,9 @@
 import express from 'express';
 import { updateCuration, deleteCuration } from '../controllers/curationController.js';
 
-const curationRouter = express.Router()
+const curationRouter = express.Router();
 
-curationRouter.put('/:curationId', updateCuration)
-curationRouter.delete('/:curationId', deleteCuration)
+curationRouter.put('/:curationId', updateCuration);
+curationRouter.delete('/:curationId', deleteCuration);
 
-export default curationRouter
+export default curationRouter;
