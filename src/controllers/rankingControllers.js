@@ -76,7 +76,6 @@ export const getRanking = async (req, res) => {
         rating: ratingOption[rankBy] || ratingOption['total']
       };
 
-      console.log(ranking[i]['costEffectiveAverage']);
       rankingList.push(thing);
     }
     return rankingList;
