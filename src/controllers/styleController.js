@@ -34,19 +34,7 @@ export const createStyle = async (req, res) => {
 export const patchStyle = async (req, res, next) => {
   try {
     const styleId = Number(req.params.styleId);
-    const { nickname, title, content, password, tags, items } = req.body;
-
-    const originalStyle = await prisma.style.findUnique({
-      where: { id: styleId }
-    });
-
-    if (!originalStyle) {
-      return res.status(404).json({ message: 'Style not found' });
-    }
-
-    if (originalStyle.password !== password) {
-      return res.status(403).json({ message: 'Incorrect password' });
-    }
+    const { nickname, title, content, tags, items } = req.body;
 
     const newImages = req.files
       ? req.files.map((file) => ({
@@ -126,11 +114,11 @@ export const patchStyle = async (req, res, next) => {
 export const deleteStyle = async (req, res, next) => {
   try {
     const styleId = Number(req.params.styleId);
-    const delStyle = await prisma.style.delete({
+    const deletedStyle = await prisma.style.delete({
       where: { id: styleId }
     });
     console.log('삭제완료');
-    res.status(200).send(delStyle);
+    res.status(200).send(deletedStyle);
   } catch (err) {
     next(err);
   }

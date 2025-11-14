@@ -4,4 +4,3 @@ __http__/
 .env
 seed.js
 .DS_Store
-/uploads
