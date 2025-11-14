@@ -7,6 +7,7 @@ import curationRouter from './routers/curationRouters.js';
 import styleRouter from './routers/styleRouter.js';
 import stylesRouter from './routers/tagRouters.js';
 import tagsRouter from './routers/tagsRouters.js';
+import rankingRouter from './routers/rankingRouters.js';
 
 const app = express();
 app.use(cors());
@@ -22,6 +23,7 @@ app.use('/styles', stylesRouter);
 
 app.use('/tag', tagsRouter);
 
+app.use('/ranking', rankingRouter);
 app.use(errorHandler);
 
 // listener
