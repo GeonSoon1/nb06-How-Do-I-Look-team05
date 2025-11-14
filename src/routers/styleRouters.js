@@ -1,20 +1,26 @@
 import express from 'express';
-import { CreateStyle, PatchStyle } from '../structs/styleStructs.js';
-import { createStyle, patchStyle, deleteStyle } from '../controllers/styleController.js';
 import { validate } from '../middlewares/styleValidator.js';
 import { upload } from '../middlewares/upload.js';
 import { createStyleCuration } from '../controllers/curationController.js';
 import { hashPassword, verifyPassword } from '../middlewares/passwordValidator.js';
+import { CreateStyle, PatchStyle } from '../structs/styleStructs.js';
+import { createStyle, patchStyle, deleteStyle } from '../controllers/styleController.js';
+import { getStyleDetail, getStyles } from '../controllers/tagController.js';
 
 const router = express.Router();
 
-router.route('/').post(upload.array('images', 5), validate(CreateStyle), hashPassword, createStyle);
+router
+  .route('/')
+  .post(upload.array('images', 5), validate(CreateStyle), hashPassword, createStyle)
+  .get(getStyles);
+
 router
   .route('/:styleId')
   .patch(upload.array('images', 5), validate(PatchStyle), verifyPassword, patchStyle)
-  .delete(upload.none(), verifyPassword, deleteStyle);
+  .delete(upload.none(), verifyPassword, deleteStyle)
+  .get(getStyleDetail);
 
 // 큐레이팅 등록
-router.post('/:styleId/curations', createStyleCuration);
+router.route('/:styleId/curations').post(createStyleCuration);
 
 export default router;
