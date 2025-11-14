@@ -108,3 +108,11 @@ model CurationComment {
   curation   Curation @relation(fields: [curationId], references: [id], onDelete: Cascade)
   curationId Int      @unique
 }
+
+// 라인 (Line)에 업로드 된 대표 이미지를 저장하는 모델
+model LineImage {
+  id        Int      @id @default(autoincrement()) // uuid 안한다고 함
+  lineId    Int      @unique // 한 라인당 하나의 이미지만 허용하기 위해 유니크 설정
+  url       String
+  createdAt DateTime @default(now())
+}
