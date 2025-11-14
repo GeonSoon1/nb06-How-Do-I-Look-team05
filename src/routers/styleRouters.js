@@ -1,6 +1,6 @@
 import express from 'express';
 import { validate } from '../middlewares/styleValidator.js';
-import { upload } from '../middlewares/upload.js';
+import { upload } from '../middlewares/upload.js'; // 여기서 upload 가져옴
 import { createStyleCuration } from '../controllers/curationController.js';
 import { hashPassword, verifyPassword } from '../middlewares/passwordValidator.js';
 import { CreateStyle, PatchStyle } from '../structs/styleStructs.js';
@@ -20,7 +20,9 @@ router
   .delete(upload.none(), verifyPassword, deleteStyle)
   .get(getStyleDetail);
 
-// 큐레이팅 등록
-router.route('/:styleId/curations').post(createStyleCuration);
-
+// 큐레이팅 등록 (스타일별, 이미지 1장)
+router.post('/:styleId/curation', upload.single('image'), createStyleCuration);
+//createStyleCuration에서 req.body + req.file을 사용
 export default router;
+
+// /styles/:styleId/curation로 들어오는 요청은 upload.single('image')거치고
