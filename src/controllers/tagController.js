@@ -13,9 +13,9 @@ export const getStyles = async (req, res) => {
   };
   //검색 필터
   const searchOprion = {
-    nickname: { nickName: { contains: keyword } },
+    nickname: { nickname: { contains: keyword } },
     title: { title: { contains: keyword } },
-    content: { description: { contains: keyword } },
+    content: { content: { contains: keyword } },
     tag: { tags: { some: { tag: { contains: keyword } } } }
   };
   //태그로 조회
@@ -36,10 +36,10 @@ export const getStyles = async (req, res) => {
         select: { url: true }
       },
       title: true,
-      nickName: true,
+      nickname: true,
       tags: { select: { tag: true } },
       items: { select: { itemName: true, brandName: true, price: true, category: true } },
-      description: true,
+      content: true,
       viewCount: true,
       _count: { select: { curations: true } },
       createdAt: true
@@ -74,10 +74,10 @@ export const getStyles = async (req, res) => {
         id: data[i]['id'],
         thumbnail: data[i]['images'][0]['url'],
         title: data[i]['title'],
-        nickname: data[i]['nickName'],
+        nickname: data[i]['nickname'],
         tags: data[i]['tags'].map((data) => data.tag),
         categories: result,
-        content: data[i]['description'],
+        content: data[i]['content'],
         viewCount: data[i]['viewCount'],
         curationCount: data[i]['_count']['curations'],
         createdAt: data[i]['createdAt']
@@ -104,9 +104,9 @@ export const getStyleDetail = async (req, res) => {
     where: { id },
     select: {
       id: true,
-      nickName: true,
+      nickname: true,
       title: true,
-      description: true,
+      content: true,
       viewCount: true,
       createdAt: true,
       _count: { select: { curations: true } },
@@ -129,9 +129,9 @@ export const getStyleDetail = async (req, res) => {
 
   const response = {
     id: data['id'],
-    nickname: data['nickName'],
+    nickname: data['nickname'],
     title: data['title'],
-    content: data['description'],
+    content: data['content'],
     viewCount: data['viewCount'],
     curationCount: data['_count']['curations'],
     createdAt: data['createdAt'],
