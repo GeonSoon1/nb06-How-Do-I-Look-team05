@@ -1,7 +1,4 @@
-import { parse } from 'dotenv';
 import { prisma } from '../utils/prisma.js';
-import { response } from 'express';
-import { object } from 'superstruct';
 
 export const getStyles = async (req, res) => {
   const { page = '1', pageSize = '12', sortBy, searchBy, keyword, tag } = req.query;
@@ -12,7 +9,7 @@ export const getStyles = async (req, res) => {
     mostCurated: [{ curations: { _count: 'desc' } }, { viewCount: 'desc' }]
   };
   //검색 필터
-  const searchOprion = {
+  const searchOption = {
     nickname: { nickname: { contains: keyword } },
     title: { title: { contains: keyword } },
     content: { content: { contains: keyword } },
@@ -24,7 +21,7 @@ export const getStyles = async (req, res) => {
   }
 
   const styles = await prisma.style.findMany({
-    where: searchOprion[searchBy] || undefined,
+    where: searchOption[searchBy] || undefined,
     orderBy: sortOption[sortBy] || sortOption['latest'],
     skip: (parseInt(page) - 1) * parseInt(pageSize),
     take: parseInt(pageSize),
