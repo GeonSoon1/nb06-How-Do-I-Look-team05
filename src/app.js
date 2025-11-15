@@ -18,6 +18,7 @@ app.use('/images', imageRouter);
 app.use('/curations', curationRouter);
 app.use('/tags', tagsRouter);
 app.use('/ranking', rankingRouter);
+app.use('/comments', commentRouter);
 
 app.use(errorHandler);
 

@@ -7,9 +7,44 @@ export const createComment = async (req, res) => {
     data: {
       ...commentData,
       curation: {
-        createOrConnect: { id: curationId }
+        connect: { id: curationId }
       }
+    },
+    select: {
+      id: true,
+      content: true,
+      createdAt: true
     }
   });
-  res.status(201).send(comment);
+
+  res.status(200).send(comment);
+};
+
+export const patchComment = async (req, res) => {
+  const commentId = parseInt(req.params.commentId, 10);
+  const { content, password } = req.body;
+  //비밀번호 검증
+  const existing = await prisma.curationComment.findUniqueOrThrow({
+    where: { id: commentId }
+  });
+  if (!existing) {
+    res.status(404).send({ message: '존재하지 않습니다' });
+  }
+
+  if (password !== existing.password) {
+    res.status(403).send({ message: '비밀번호가 틀렸습니다' });
+  }
+  //업데이트
+  const comment = await prisma.curationComment.update({
+    where: { id: commentId },
+    data: {
+      content
+    },
+    select: {
+      id: true,
+      content: true,
+      createdAt: true
+    }
+  });
+  res.status(200).send(comment);
 };
