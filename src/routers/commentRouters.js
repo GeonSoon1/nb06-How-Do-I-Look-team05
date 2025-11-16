@@ -9,7 +9,7 @@ const commentRouter = express.Router();
 
 commentRouter
   .route('/:commentId')
-  .patch(commentValidator(PatchComment), verifyPassword, patchComment)
+  .patch(commentValidator(PatchComment), patchComment)
   .delete(upload.none(), verifyPassword, deleteComment);
 
 export default commentRouter;

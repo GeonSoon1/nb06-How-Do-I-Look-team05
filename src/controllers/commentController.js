@@ -4,38 +4,47 @@ import { prisma } from '../utils/prisma.js';
 export const createComment = async (req, res) => {
   const curationId = parseInt(req.params.curationId, 10);
   const commentData = req.body;
-  const comment = await prisma.curationComment.create({
-    data: {
-      ...commentData,
-      curation: {
-        connect: { id: curationId }
+  // 건순: curation테이블에서 curationId가 일치하는 row의 styleId를 가지고 와볼까  -> 민혁 : nc idea
+
+  const comment = await prisma.$transaction(async (tx) => {
+    const curation = await tx.curation.findUniqueOrThrow({
+      where: { id: curationId }
+    });
+    const styleId = curation['styleId'];
+
+    const comment = await tx.curationComment.create({
+      data: {
+        ...commentData,
+        curation: {
+          connect: { id: curationId }
+        },
+        style: {
+          connect: { id: styleId }
+        }
+      },
+      select: {
+        id: true,
+        style: { select: { nickname: true } },
+        content: true,
+        createdAt: true
       }
-    },
-    select: {
-      id: true,
-      content: true,
-      createdAt: true
-    }
+    });
+    return comment;
   });
 
-  res.status(200).send(comment);
+  const response = {
+    id: comment['id'],
+    nickname: comment['style']['nickname'],
+    content: comment['content'],
+    createdAt: comment['createdAt']
+  };
+  res.status(200).send(response);
 };
 
 // 업데이트
 export const patchComment = async (req, res) => {
   const commentId = parseInt(req.params.commentId, 10);
-  const { content, password } = req.body;
-  //비밀번호 검증
-  const existing = await prisma.curationComment.findUniqueOrThrow({
-    where: { id: commentId }
-  });
-  if (!existing) {
-    res.status(404).send({ message: '존재하지 않습니다' });
-  }
-
-  if (password !== existing.password) {
-    res.status(403).send({ message: '비밀번호가 틀렸습니다' });
-  }
+  const { content } = req.body;
 
   const comment = await prisma.curationComment.update({
     where: { id: commentId },
@@ -44,6 +53,7 @@ export const patchComment = async (req, res) => {
     },
     select: {
       id: true,
+      style: { select: { nickname: true } },
       content: true,
       createdAt: true
     }
