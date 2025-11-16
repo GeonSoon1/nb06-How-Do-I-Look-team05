@@ -1,12 +1,9 @@
 import express from 'express';
-import { updateCuration, deleteCuration } from '../controllers/curationController.js';
-import { createComment } from '../controllers/commentController.js';
-import { commentValidator } from '../middlewares/commentValidator.js';
-import { CreateComment } from '../structs/commentStructs.js';
-const curationRouter = express.Router();
+import { updateCuration, deleteCuration } from '../structs/curationStructs.js';
 
-curationRouter.route('/:curationId').put(updateCuration).delete(deleteCuration);
+const curationRouter = express.Router()
 
-curationRouter.route('/:curationId/comments').post(commentValidator(CreateComment), createComment);
+curationRouter.put('/:curationId', updateCuration)
+curationRouter.delete('/:curationId', deleteCuration)
 
-export default curationRouter;
+export default curationRouter

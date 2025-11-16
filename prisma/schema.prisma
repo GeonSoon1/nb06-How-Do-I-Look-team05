@@ -15,38 +15,37 @@ datasource db {
 
 // 스타일
 model Style {
-  id                   Int               @id @default(autoincrement())
-  nickname             String
+  id                   String     @id @default(uuid())
+  nickName             String
   title                String
-  content              String?
+  description          String?
   password             String
-  trendyAverage        Decimal           @default(0.0)
-  uniqueAverage        Decimal           @default(0.0)
-  practicalAverage     Decimal           @default(0.0)
-  costEffectiveAverage Decimal           @default(0.0)
-  totalAverage         Decimal           @default(0.0)
-  createdAt            DateTime          @default(now())
-  updatedAt            DateTime          @updatedAt
-  viewCount            Int               @default(0)
-  curationCount        Int               @default(0) // <- 상운: API 명세서 다시 확인해보니 response에 이 항목이 있었네요.
+  trendyAverage        Decimal    @default(0.0)
+  uniqueAverage        Decimal    @default(0.0)
+  practicalAverage     Decimal    @default(0.0)
+  costEffectiveAverage Decimal    @default(0.0)
+  totalAverage         Decimal    @default(0.0)
+  createdAt            DateTime   @default(now())
+  updatedAt            DateTime   @updatedAt
+  viewCount            Int        @default(0)
+  curationCount        Int        @default(0) // <- 상운: API 명세서 다시 확인해보니 response에 이 항목이 있었네요.
   tags                 Tag[]
   images               Image[]
   items                Item[]
   curations            Curation[]
-  curationComments     CurationComment[]
 
-  @@index([title, content])
+  @@index([title, description])
 }
 
 // 스타일 구성 아이템
 model Item {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(uuid())
   itemName  String
   brandName String
   price     Decimal  @default(0.0)
   category  Category
   style     Style    @relation(fields: [styleId], references: [id], onDelete: Cascade)
-  styleId   Int
+  styleId   String
 }
 
 // 스타일 구성 카테고리
@@ -62,7 +61,7 @@ enum Category {
 
 // 태그
 model Tag {
-  id         Int      @id @default(autoincrement())
+  id         String   @id @default(uuid())
   tag        String   @unique
   styleCount Int      @default(0) // <-태그당 룩북수
   clickCount Int      @default(0)
@@ -73,49 +72,39 @@ model Tag {
 
 // 이미지
 model Image {
-  id          Int      @id @default(autoincrement())
+  id          String   @id @default(uuid())
   url         String // 이미지 파일 경로 또는 URL
   isThumbnail Boolean  @default(false) // 대표이미지 설정
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   style       Style    @relation(fields: [styleId], references: [id], onDelete: Cascade)
-  styleId     Int
+  styleId     String
 }
 
 // 큐레이팅
 model Curation {
-  id                Int              @id @default(autoincrement())
+  id                String           @id @default(uuid())
   trendy            Int              @default(0)
   personality       Int              @default(0)
   practicality      Int              @default(0)
   costEffectiveness Int              @default(0)
   content           String
-  nickname          String
+  nickName          String
   password          String
   createdAt         DateTime         @default(now())
   updatedAt         DateTime         @updatedAt
   style             Style            @relation(fields: [styleId], references: [id], onDelete: Cascade)
-  styleId           Int
+  styleId           String
   curationComment   CurationComment?
 }
 
 // 덧글
 model CurationComment {
-  id         Int      @id @default(autoincrement())
+  id         String   @id @default(uuid())
   content    String
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
   password   String
   curation   Curation @relation(fields: [curationId], references: [id], onDelete: Cascade)
-  curationId Int      @unique
-  style      Style    @relation(fields: [styleId], references: [id], onDelete: Cascade)
-  styleId    Int
-}
-
-// 라인 (Line)에 업로드 된 대표 이미지를 저장하는 모델
-model LineImage {
-  id        Int      @id @default(autoincrement()) // uuid 안한다고 함
-  lineId    Int      @unique // 한 라인당 하나의 이미지만 허용하기 위해 유니크 설정
-  url       String
-  createdAt DateTime @default(now())
+  curationId String   @unique
 }

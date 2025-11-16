@@ -1,9 +1,9 @@
 import * as s from 'superstruct';
 
 export const CreateStyle = s.object({
-  nickname: s.size(s.string(), 1, 30),
+  nickName: s.size(s.string(), 1, 30),
   title: s.size(s.string(), 1, 100),
-  content: s.optional(s.string()),
+  description: s.optional(s.string()),
   password: s.string(),
   tags: s.optional(s.array(s.string())),
   images: s.optional(s.array(s.string())),
