@@ -6,9 +6,9 @@
 
 ################
 # ✨ feat : 새로운 기능 추가
+# ♻️ chore(update) : 코드 수정
 # 🐛 fix : 버그 수정
 # 📝 docs : 문서 수정
 # 🛠️ refactor : 리팩토링
-# ✅ test : 테스트 추가/수정
+# ✅ test : 테스트 
 # 🔥 remove : 코드/파일 삭제
-# ♻️ chore(update)

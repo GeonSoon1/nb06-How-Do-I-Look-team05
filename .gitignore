@@ -3,3 +3,5 @@ __http__/
 .vscode/
 .env
 seed.js
+.DS_Store
+.vscode/

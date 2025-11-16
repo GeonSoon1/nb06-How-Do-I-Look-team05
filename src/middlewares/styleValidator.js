@@ -19,8 +19,8 @@ export const validate = (schema) => {
 
       const dataForValidation = {
         ...styleData,
-        nickName: nickname,
-        description: content,
+        nickname,
+        content,
         tags: parsedTags,
         images,
         items
