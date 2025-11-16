@@ -21,7 +21,9 @@ export const createStyleCuration = async (req, res) => {
   const curation = await prisma.curation.create({
     data: {
       ...curationData,
-      styleId
+      style: {
+        connect: {id: styleId}
+      }
     },
     select: {
       id: true,
@@ -37,6 +39,8 @@ export const createStyleCuration = async (req, res) => {
   res.status(200).send(curation);
 };
 
+
+
 // 큐레이팅 목록 조회 http://localhost:3000/styles/{styleId}/curations
 export const getStyleCuration = async (req, res) => {
   const styleId = parseInt(req.params.styleId, 10);
@@ -50,26 +54,27 @@ export const getStyleCuration = async (req, res) => {
         ]
       }
     : undefined;
-
-  const styleCurations = await prisma.style.findUniqueOrThrow({
-    where: { id: styleId },
-    include: {
-      curations: {
-        where,
-        skip: parseInt(page),
-        take: parseInt(pageSize),
-        select: {
-          id: true,
-          nickname: true,
+  
+  // 출력되는 response를 보면 curation 테이블에서 결과를 가져와야한다.
+  const styleCurations = await prisma.curation.findMany({
+    where: { styleId: styleId },
+    select: {
+      id: true,
+      nickname: true,
+      content: true,
+      trendy: true,
+      personality: true,
+      practicality: true,
+      costEffectiveness: true,
+      createdAt: true,
+      curationComment: {
+        select: { 
+          id: true, 
+          // nickname이 없다.
           content: true,
-          trendy: true,
-          personality: true,
-          practicality: true,
-          costEffectiveness: true,
           createdAt: true
-        }
       }
-    }
+    }}
   });
   res.status(200).send(styleCurations);
 };
