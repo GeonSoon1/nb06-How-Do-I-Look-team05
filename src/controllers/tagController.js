@@ -96,22 +96,31 @@ export const getStyles = async (req, res) => {
 
 //스타일 상제 조회
 export const getStyleDetail = async (req, res) => {
-  const { id } = req.params;
-  const style = await prisma.style.findUniqueOrThrow({
-    where: { id },
-    select: {
-      id: true,
-      nickname: true,
-      title: true,
-      content: true,
-      viewCount: true,
-      createdAt: true,
-      _count: { select: { curations: true } },
-      items: { select: { itemName: true, brandName: true, price: true, category: true } },
-      tags: { select: { tag: true } },
-      images: { select: { url: true } }
-    }
+  const styleId = parseInt(req.params.styleId, 10);
+
+  const style = await prisma.$transaction(async (tx) => {
+    const detail = await tx.style.findUniqueOrThrow({
+      where: { id: styleId },
+      select: {
+        id: true,
+        nickname: true,
+        title: true,
+        content: true,
+        viewCount: true,
+        createdAt: true,
+        curationCount: true,
+        items: { select: { itemName: true, brandName: true, price: true, category: true } },
+        tags: { select: { tag: true } },
+        images: { select: { url: true } }
+      }
+    });
+    await tx.style.update({
+      where: { id: detail.id },
+      data: { viewCount: { increment: 1 } }
+    });
+    return detail;
   });
+
   //리스폰스------------------
   const data = style;
 
@@ -130,7 +139,7 @@ export const getStyleDetail = async (req, res) => {
     title: data['title'],
     content: data['content'],
     viewCount: data['viewCount'],
-    curationCount: data['_count']['curations'],
+    curationCount: data['curationCount'],
     createdAt: data['createdAt'],
     categories: spread,
     tag: data['tags'].map((tags) => tags.tag),
