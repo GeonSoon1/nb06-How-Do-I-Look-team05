@@ -9,8 +9,8 @@ export const hashPassword = async (req, res, next) => {
   }
   try {
     const saltRounds = 10;
-    const hashPassword = await bcrypt.hash(password, saltRounds);
-    req.body.password = hashPassword;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    req.body.password = hashedPassword;
     next();
   } catch (err) {
     next(err);
@@ -19,26 +19,40 @@ export const hashPassword = async (req, res, next) => {
 
 export const verifyPassword = async (req, res, next) => {
   try {
-    const styleId = Number(req.params.styleId);
+    const { ...param } = req.params;
+    const id = Number(Object.values(param)[0]);
+    const modelName = Object.keys(param)[0].replace('Id', '');
+
     const { password } = req.body;
 
     if (!password) {
       return res.status(400).json({ message: '비밀번호를 입력해주세요.' });
     }
 
-    const foundStyle = await prisma.style.findUnique({
-      where: { id: styleId }
-    });
-
-    if (!foundStyle) {
-      return res.status(404).json({ message: '게시글이 존재하지 않습니다.' });
+    let item;
+    if (modelName === 'style') {
+      item = await prisma.style.findUnique({
+        where: { id }
+      });
+    } else if (modelName === 'comment') {
+      item = await prisma.curationComment.findUnique({
+        where: { id }
+      });
     }
 
-    const isPasswordCorrect = await bcrypt.compare(password, foundStyle.password);
+    if (!item) {
+      const message =
+        modelName === 'style' ? '게시글이 존재하지 않습니다.' : '댓글이 존재하지 않습니다.';
+      return res.status(404).json({ message });
+    }
+
+    const isPasswordCorrect = await bcrypt.compare(password, item.password);
 
     if (!isPasswordCorrect) {
       return res.status(401).json({ message: '비밀번호가 일치하지 않습니다.' });
     }
+
+    console.log('비밀번호 확인 완료');
 
     next();
   } catch (err) {

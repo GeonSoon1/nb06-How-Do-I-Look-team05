@@ -1,5 +1,6 @@
 import { prisma } from '../utils/prisma.js';
 
+// 등록
 export const createComment = async (req, res) => {
   const curationId = parseInt(req.params.curationId, 10);
   const commentData = req.body;
@@ -20,6 +21,7 @@ export const createComment = async (req, res) => {
   res.status(200).send(comment);
 };
 
+// 업데이트
 export const patchComment = async (req, res) => {
   const commentId = parseInt(req.params.commentId, 10);
   const { content, password } = req.body;
@@ -34,7 +36,7 @@ export const patchComment = async (req, res) => {
   if (password !== existing.password) {
     res.status(403).send({ message: '비밀번호가 틀렸습니다' });
   }
-  //업데이트
+
   const comment = await prisma.curationComment.update({
     where: { id: commentId },
     data: {
@@ -47,4 +49,18 @@ export const patchComment = async (req, res) => {
     }
   });
   res.status(200).send(comment);
+};
+
+// 삭제
+export const deleteComment = async (req, res) => {
+  try {
+    const commentId = Number(req.params.commentId);
+    console.log(commentId);
+    const comment = await prisma.curationComment.delete({
+      where: { id: commentId }
+    });
+    res.status(200).send(comment);
+  } catch (err) {
+    next(err);
+  }
 };
