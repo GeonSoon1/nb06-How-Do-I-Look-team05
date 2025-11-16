@@ -55,7 +55,6 @@ export const patchComment = async (req, res) => {
 export const deleteComment = async (req, res) => {
   try {
     const commentId = Number(req.params.commentId);
-    console.log(commentId);
     const comment = await prisma.curationComment.delete({
       where: { id: commentId }
     });
