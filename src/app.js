@@ -14,11 +14,11 @@ app.use(cors());
 app.use(express.json());
 
 app.use('/styles', styleRouter);
-app.use('/images', imageRouter);
+app.use('/ranking', rankingRouter);
 app.use('/curations', curationRouter);
 app.use('/tags', tagsRouter);
-app.use('/ranking', rankingRouter);
 app.use('/comments', commentRouter);
+app.use('/images', imageRouter);
 
 app.use(errorHandler);
 
