@@ -15,24 +15,25 @@ datasource db {
 
 // 스타일
 model Style {
-  id                   Int        @id @default(autoincrement())
+  id                   Int               @id @default(autoincrement())
   nickname             String
   title                String
   content              String?
   password             String
-  trendyAverage        Decimal    @default(0.0)
-  uniqueAverage        Decimal    @default(0.0)
-  practicalAverage     Decimal    @default(0.0)
-  costEffectiveAverage Decimal    @default(0.0)
-  totalAverage         Decimal    @default(0.0)
-  createdAt            DateTime   @default(now())
-  updatedAt            DateTime   @updatedAt
-  viewCount            Int        @default(0)
-  curationCount        Int        @default(0) // <- 상운: API 명세서 다시 확인해보니 response에 이 항목이 있었네요.
+  trendyAverage        Decimal           @default(0.0)
+  uniqueAverage        Decimal           @default(0.0)
+  practicalAverage     Decimal           @default(0.0)
+  costEffectiveAverage Decimal           @default(0.0)
+  totalAverage         Decimal           @default(0.0)
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
+  viewCount            Int               @default(0)
+  curationCount        Int               @default(0) // <- 상운: API 명세서 다시 확인해보니 response에 이 항목이 있었네요.
   tags                 Tag[]
   images               Image[]
   items                Item[]
   curations            Curation[]
+  curationComments     CurationComment[]
 
   @@index([title, content])
 }
@@ -107,6 +108,8 @@ model CurationComment {
   password   String
   curation   Curation @relation(fields: [curationId], references: [id], onDelete: Cascade)
   curationId Int      @unique
+  style      Style    @relation(fields: [styleId], references: [id], onDelete: Cascade)
+  styleId    Int
 }
 
 // 라인 (Line)에 업로드 된 대표 이미지를 저장하는 모델

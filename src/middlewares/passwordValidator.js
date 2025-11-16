@@ -23,11 +23,7 @@ export const verifyPassword = async (req, res, next) => {
     const id = Number(Object.values(param)[0]);
     const modelName = Object.keys(param)[0].replace('Id', '');
 
-    console.log('Id:', id);
-    console.log('modelName:', modelName);
-
     const { password } = req.body;
-    console.log({ password });
 
     if (!password) {
       return res.status(400).json({ message: '비밀번호를 입력해주세요.' });
