@@ -117,7 +117,6 @@ export const deleteStyle = async (req, res, next) => {
     const deletedStyle = await prisma.style.delete({
       where: { id: styleId }
     });
-    console.log('삭제완료');
     res.status(200).send(deletedStyle);
   } catch (err) {
     next(err);
