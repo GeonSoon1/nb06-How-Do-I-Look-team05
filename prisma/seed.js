@@ -1,10 +1,12 @@
 import { PrismaClient } from '@prisma/client';
 import { fakerKO as faker } from '@faker-js/faker';
+import bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
 
 async function main() {
   console.log('한국어 더미데이터 생성 시작...');
+  const hashedPassword = bcrypt.hashSync('password123', 10);
 
   // 1. 중복 없는 태그 생성
   const tagPool = [
@@ -218,7 +220,8 @@ async function main() {
         nickname: faker.animal.petName({ min: 2, max: 10 }),
         title: faker.helpers.arrayElement(titlePool),
         content: faker.helpers.arrayElement(descriptionPool),
-        password: faker.number.int({ min: 1000, max: 9999 }).toString(),
+        // password: faker.number.int({ min: 1000, max: 9999 }).toString(),
+        password: hashedPassword,
         trendyAverage: faker.number.float({ min: 1, max: 10 }).toFixed(1),
         uniqueAverage: faker.number.float({ min: 1, max: 10 }).toFixed(1),
         practicalAverage: faker.number.float({ min: 1, max: 10 }).toFixed(1),
@@ -274,21 +277,29 @@ async function main() {
             costEffectiveness: faker.number.int({ min: 1, max: 10 }),
             content: faker.lorem.paragraphs({ min: 1, max: 2 }),
             nickname: faker.animal.petName({ min: 2, max: 10 }),
-            password: faker.number.int({ min: 1000, max: 9999 }).toString(),
-            curationComment: faker.datatype.boolean()
-              ? {
-                  create: {
-                    content: faker.helpers.arrayElement(commentPool),
-                    password: faker.number.int({ min: 1000, max: 9999 }).toString()
-                  }
-                }
-              : undefined
+            password: hashedPassword
           }))
         }
       }
     });
 
     console.log(`스타일 생성 완료 (${i + 1}/100): ${style.title}`);
+  }
+
+  const allCurations = await prisma.curation.findMany();
+  for (const curation of allCurations) {
+    if (faker.datatype.boolean()) {
+      await prisma.curationComment.create({
+        data: {
+          content: faker.helpers.arrayElement(commentPool),
+          password: hashedPassword,
+          // password: faker.number.int({ min: 1000, max: 9999 }).toString(),
+          curationId: curation.id,
+          styleId: curation.styleId
+        }
+      });
+      console.log(`큐레이션 ID ${curation.id}에 덧글 추가 완료`);
+    }
   }
 
   console.log('🌱 모든 한국어 더미 데이터 생성 완료!');
