@@ -1,12 +1,12 @@
-import { assert } from 'superstruct'
+import { assert } from 'superstruct';
 
-export const curationVaildator = (structs) => {
+export const curationValidator = (structs) => {
   return async (req, res, next) => {
     try {
-      assert(req.body, structs)
+      assert(req.body, structs);
       next();
     } catch (e) {
       next();
     }
-  }
-}
+  };
+};
