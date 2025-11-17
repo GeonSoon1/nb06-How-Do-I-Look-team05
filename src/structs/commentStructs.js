@@ -7,7 +7,7 @@ export const CreateComment = s.object({
 
 export const PatchComment = s.object({
   content: s.size(s.string(), 1, 50),
-  password: s.size(s.string(), 1, 10)
+  password: s.string()
 });
 
 export const DeleteComment = s.object({

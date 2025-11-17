@@ -3,7 +3,7 @@ import { prisma } from '../utils/prisma.js';
 // 등록
 export const createComment = async (req, res) => {
   const curationId = parseInt(req.params.curationId, 10);
-  const commentData = req.body;
+  const { content } = req.body;
   // 건순: curation테이블에서 curationId가 일치하는 row의 styleId를 가지고 와볼까  -> 민혁 : nc idea
 
   const comment = await prisma.$transaction(async (tx) => {
@@ -11,10 +11,15 @@ export const createComment = async (req, res) => {
       where: { id: curationId }
     });
     const styleId = curation['styleId'];
+    const style = await tx.style.findUniqueOrThrow({
+      where: { id: styleId }
+    });
+    const stylePassword = style['password'];
 
     const comment = await tx.curationComment.create({
       data: {
-        ...commentData,
+        content,
+        password: stylePassword,
         curation: {
           connect: { id: curationId }
         },
@@ -58,7 +63,13 @@ export const patchComment = async (req, res) => {
       createdAt: true
     }
   });
-  res.status(200).send(comment);
+  const response = {
+    id: comment['id'],
+    nickname: comment['style']['nickname'],
+    content: comment['content'],
+    createdAt: comment['createdAt']
+  };
+  res.status(200).send(response);
 };
 
 // 삭제

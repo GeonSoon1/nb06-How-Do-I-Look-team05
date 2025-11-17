@@ -25,7 +25,7 @@ const modelConfig = {
     model: prisma.curationComment,
     notFoundMessage: '댓글이 존재하지 않습니다.'
   },
-  curation: {                             
+  curation: {
     model: prisma.curation,
     notFoundMessage: '큐레이팅이 존재하지 않습니다.'
   }
@@ -36,8 +36,8 @@ export const verifyPassword = async (req, res, next) => {
     const paramKey = Object.keys(req.params)[0];
     const id = Number(req.params[paramKey]);
     const modelName = paramKey.replace('Id', '');
-
     const { password } = req.body;
+
     if (!password) {
       return res.status(400).json({ message: '비밀번호를 입력해주세요.' });
     }
@@ -62,4 +62,29 @@ export const verifyPassword = async (req, res, next) => {
   } catch (err) {
     next(err);
   }
+};
+
+export const verifyStylePassword = async (req, res, next) => {
+  try {
+    const curationId = parseInt(req.params.curationId, 10);
+    const { password } = req.body;
+    const isStylePassword = await prisma.$transaction(async (tx) => {
+      const curation = await tx.curation.findUnique({ where: { id: curationId } });
+      const style = await tx.style.findUnique({ where: { id: curation['styleId'] } });
+      const stylePassword = style['password'];
+      return stylePassword;
+    });
+
+    if (!password) {
+      return res.status(400).json({ message: '잘못된 요청입니다' });
+    }
+
+    const isStylePasswordCorrect = await bcrypt.compare(password, isStylePassword);
+    if (!isStylePasswordCorrect) {
+      return res.status(400).json({ message: '잘못된 요청입니다' });
+    }
+  } catch (e) {
+    next();
+  }
+  next();
 };
