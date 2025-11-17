@@ -34,65 +34,51 @@ export const createStyle = async (req, res) => {
 export const patchStyle = async (req, res, next) => {
   try {
     const styleId = Number(req.params.styleId);
-    const { nickname, title, content, tags, items } = req.body;
-
-    const newImages = req.files
-      ? req.files.map((file) => ({
-          url: file.path,
-          isThumbnail: false
-        }))
-      : [];
+    const { nickname, title, content, tags, items, images } = req.body;
 
     const updatedStyle = await prisma.$transaction(async (tx) => {
-      const styleUpdateData = {};
-      if (nickname) styleUpdateData.nickname = nickname;
-      if (title) styleUpdateData.title = title;
-      if (content !== undefined) styleUpdateData.content = content;
-
       await tx.style.update({
         where: { id: styleId },
-        data: styleUpdateData
+        data: {
+          nickname,
+          title,
+          content
+        }
       });
 
+      if (req.files && req.files.length > 0) {
+        await tx.image.deleteMany({ where: { styleId } });
+        await tx.image.createMany({
+          data: images.map((img) => ({ ...img, styleId }))
+        });
+      }
+
+      if (items) {
+        await tx.item.deleteMany({ where: { styleId } });
+        await tx.item.createMany({
+          data: items.map((item) => ({ ...item, styleId }))
+        });
+      }
+
       if (tags) {
-        const tagOperations = tags.map((tag) =>
-          tx.tag.upsert({
-            where: { tag },
-            update: {},
-            create: { tag }
-          })
+        const tagUpsert = await Promise.all(
+          tags.map((tag) =>
+            tx.tag.upsert({
+              where: { tag },
+              update: {},
+              create: { tag }
+            })
+          )
         );
-        const upsertTags = await Promise.all(tagOperations);
 
         await tx.style.update({
           where: { id: styleId },
           data: {
             tags: {
-              set: upsertTags.map((t) => ({ id: t.id }))
+              set: tagUpsert.map((t) => ({ id: t.id }))
             }
           }
         });
-      }
-
-      if (items) {
-        await tx.item.deleteMany({
-          where: { styleId }
-        });
-        await tx.image.createMany({
-          data: newImages.map((img) => ({
-            ...img,
-            styleId
-          }))
-        });
-        const firstImage = await tx.image.findFirst({
-          where: { styleId }
-        });
-        if (firstImage) {
-          await tx.image.update({
-            where: { id: firstImage.id },
-            data: { isThumbnail: true }
-          });
-        }
       }
 
       return tx.style.findUnique({
