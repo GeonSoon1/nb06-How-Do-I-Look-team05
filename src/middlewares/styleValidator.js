@@ -3,7 +3,7 @@ import { assert } from 'superstruct';
 export const validate = (schema) => {
   return (req, res, next) => {
     try {
-      const images = (req.files || []).map((file) => file.path);
+      const images = (req.files || []).map((file) => `/uploads/${file.filename}`);
       const { tags, categories, nickname, content, ...styleData } = req.body;
 
       const parsedCategories =
