@@ -3,7 +3,6 @@ import { prisma } from '../utils/prisma.js';
 
 export const hashPassword = async (req, res, next) => {
   const { password } = req.body;
-
   if (!password) {
     return next();
   }
@@ -25,6 +24,10 @@ const modelConfig = {
   comment: {
     model: prisma.curationComment,
     notFoundMessage: '댓글이 존재하지 않습니다.'
+  },
+  curation: {                             
+    model: prisma.curation,
+    notFoundMessage: '큐레이팅이 존재하지 않습니다.'
   }
 };
 

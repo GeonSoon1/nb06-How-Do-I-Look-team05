@@ -6,6 +6,8 @@ import { CreateStyle, PatchStyle } from '../structs/styleStructs.js';
 import { createStyle, patchStyle, deleteStyle } from '../controllers/styleController.js';
 import { getStyleDetail, getStyles } from '../controllers/tagController.js';
 import { createStyleCuration, getStyleCuration } from '../controllers/curationController.js';
+import { CreateCuration } from '../structs/curationStructs.js'
+import { curationVaildator } from '../middlewares/curationValidator.js';
 const router = express.Router();
 
 router
@@ -21,9 +23,11 @@ router
 
 // 큐레이팅 등록 (스타일별, 이미지 1장)
 // router.post('/:styleId/curation', upload.single('image'), createStyleCuration);
-//createStyleCuration에서 req.body + req.file을 사용
+// createStyleCuration에서 req.body + req.file을 사용
 
-router.route('/:styleId/curations').post(createStyleCuration).get(getStyleCuration);
+router.route('/:styleId/curations')
+      .post(curationVaildator(CreateCuration), hashPassword, createStyleCuration)
+      .get(getStyleCuration);
 
 export default router;
 
