@@ -41,43 +41,112 @@ export const createStyleCuration = async (req, res) => {
 
 
 
-// 큐레이팅 목록 조회 http://localhost:3000/styles/{styleId}/curations
+
+// 큐레이팅 목록 조회 GET /styles/:styleId/curations
 export const getStyleCuration = async (req, res) => {
   const styleId = parseInt(req.params.styleId, 10);
-  const { page = 1, pageSize = 10, keyword } = req.query;
+  const { page = 1, pageSize = 10, searchBy, keyword } = req.query;
 
-  const where = keyword
-    ? {
+  const pageNum = parseInt(page, 10) || 1;
+  const pageSizeNum = parseInt(pageSize, 10) || 10;
+
+  // 검색 조건
+  let searchCondition = {};
+
+  if (keyword) {
+    if (searchBy === 'nickname') {
+      // 큐레이션 닉네임 검색
+      searchCondition = {
+        nickname: { contains: keyword, mode: 'insensitive' }
+      };
+    } else if (searchBy === 'content') {
+      // 큐레이션 내용 검색
+      searchCondition = {
+        content: { contains: keyword, mode: 'insensitive' }
+      };
+    } else {
+      // 둘 다
+      searchCondition = {
         OR: [
           { nickname: { contains: keyword, mode: 'insensitive' } },
           { content: { contains: keyword, mode: 'insensitive' } }
         ]
+      };
+    }
+  }
+
+  const where = {
+    styleId,      // 이 스타일에 속한 큐레이션만
+    ...searchCondition
+  };
+
+  try {
+    // 전체 개수
+    const totalItemCount = await prisma.curation.count({ where });
+
+    // 목록 조회
+    const curations = await prisma.curation.findMany({
+      where,
+      skip: (pageNum - 1) * pageSizeNum,
+      take: pageSizeNum,
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        nickname: true,         // 큐레이션 작성자 닉네임
+        content: true,
+        trendy: true,
+        personality: true,
+        practicality: true,
+        costEffectiveness: true,
+        createdAt: true,
+        style: {
+          select: {
+            nickname: true      //  Style 닉네임
+          }
+        },
+        curationComment: {
+          select: {
+            id: true,
+            content: true,
+            createdAt: true
+          }
+        }
       }
-    : undefined;
-  
-  // 출력되는 response를 보면 curation 테이블에서 결과를 가져와야한다.
-  const styleCurations = await prisma.curation.findMany({
-    where: { styleId: styleId },
-    select: {
-      id: true,
-      nickname: true,
-      content: true,
-      trendy: true,
-      personality: true,
-      practicality: true,
-      costEffectiveness: true,
-      createdAt: true,
-      curationComment: {
-        select: { 
-          id: true, 
-          // nickname이 없다.
-          content: true,
-          createdAt: true
-      }
-    }}
-  });
-  res.status(200).send(styleCurations);
+    });
+
+    // 응답 모양 맞추기
+    const data = curations.map((c) => ({
+      id: c.id,
+      nickname: c.nickname, // 상단 nickname = 큐레이션 닉네임
+      content: c.content,
+      trendy: c.trendy,
+      personality: c.personality,
+      practicality: c.practicality,
+      costEffectiveness: c.costEffectiveness,
+      createdAt: c.createdAt,
+      comment: c.curationComment
+        ? {
+            id: c.curationComment.id,
+            // comment.nickname은 Style.nickname에서 가져옴
+            nickname: c.style.nickname,
+            content: c.curationComment.content,
+            createdAt: c.curationComment.createdAt
+          }
+        : {}
+    }));
+
+    res.status(200).json({
+      currentPage: pageNum,
+      totalPages: Math.ceil(totalItemCount / pageSizeNum),
+      totalItemCount,
+      data
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
 };
+
 
 // 큐레이팅 수정 http://localhost:3000/curations/{curationId}
 export const updateCuration = async (req, res) => {
