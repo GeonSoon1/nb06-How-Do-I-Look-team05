@@ -12,6 +12,7 @@ import commentRouter from './routers/commentRouters.js';
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use('/uploads', express.static('uploads'));
 
 app.use('/styles', styleRouter);
 app.use('/ranking', rankingRouter);

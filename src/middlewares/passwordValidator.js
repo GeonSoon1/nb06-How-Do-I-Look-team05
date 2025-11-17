@@ -84,7 +84,6 @@ export const verifyStylePassword = async (req, res, next) => {
       return res.status(400).json({ message: '잘못된 요청입니다' });
     }
   } catch (e) {
-    next();
+    next(e);
   }
-  next();
 };
