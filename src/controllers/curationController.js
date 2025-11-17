@@ -6,25 +6,40 @@ export const createStyleCuration = async (req, res) => {
   const styleId = parseInt(req.params.styleId, 10);
   const curationData = req.body;
 
-  // styleId로 FK 연결되어있는 스타일의 큐레이션 생성
-  const curation = await prisma.curation.create({
-    data: {
-      ...curationData,
-      style: {
-        connect: {id: styleId}
+  const curation = await prisma.$transaction(async (tx) => {
+    // 1) 큐레이션 생성
+    const created = await tx.curation.create({
+      data: {
+        ...curationData,
+        style: {
+          connect: { id: styleId }
+        }
+      },
+      select: {
+        id: true,
+        nickname: true,
+        content: true,
+        trendy: true,
+        personality: true,
+        practicality: true,
+        costEffectiveness: true,
+        createdAt: true
       }
-    },
-    select: {
-      id: true,
-      nickname: true,
-      content: true,
-      trendy: true,
-      personality: true,
-      practicality: true,
-      costEffectiveness: true,
-      createdAt: true
-    }
+    });
+
+    // 2) 해당 style의 curationCount +1
+    await tx.style.update({
+      where: { id: styleId },
+      data: {
+        curationCount: {
+          increment: 1   // Prisma에서 숫자 필드 +1 할 때 쓰는 문법
+        }
+      }
+    });
+
+    return created;
   });
+
   res.status(200).send(curation);
 };
 
@@ -173,14 +188,38 @@ export const updateCuration = async (req, res) => {
 // 큐레이팅 삭제 http://localhost:3000/curations/{curationId}
 export const deleteCuration = async (req, res) => {
   const curationId = parseInt(req.params.curationId, 10);
-  
-  // 큐레이팅 삭제
+
   try {
-    await prisma.curation.delete({
-      where: { id: curationId }
+    // 1) 먼저 이 큐레이션이 어떤 스타일에 속해 있는지 조회
+    const existing = await prisma.curation.findUnique({
+      where: { id: curationId },
+      select: { styleId: true }
     });
-    res.status(200).send({ message: '큐레이팅 삭제 성공' });
+
+    if (!existing) {
+      return res.status(404).send({ message: '큐레이팅이 존재하지 않습니다.' });
+    }
+
+    const styleId = existing.styleId;
+
+    // 2) 삭제 + curationCount 감소를 트랜잭션으로 처리
+    await prisma.$transaction([
+      prisma.curation.delete({
+        where: { id: curationId }
+      }),
+      prisma.style.update({
+        where: { id: styleId },
+        data: {
+          curationCount: {
+            decrement: 1   // 숫자 필드 -1
+          }
+        }
+      })
+    ]);
+
+    return res.status(200).send({ message: '큐레이팅 삭제 성공' });
   } catch (err) {
-    res.status(404).send({ message: '큐레이팅이 존재하지 않습니다.' });
+    console.error(err);
+    return res.status(500).send({ message: 'Internal Server Error' });
   }
 };
