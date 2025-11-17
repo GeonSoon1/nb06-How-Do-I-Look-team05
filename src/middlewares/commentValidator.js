@@ -6,7 +6,7 @@ export const commentValidator = (structs) => {
       assert(req.body, structs);
       next();
     } catch (e) {
-      next();
+      next(e);
     }
   };
 };

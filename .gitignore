@@ -5,3 +5,4 @@ __http__/
 seed.js
 .DS_Store
 .vscode/
+code_analysis_report.md

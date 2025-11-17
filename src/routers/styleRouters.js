@@ -1,6 +1,6 @@
 import express from 'express';
 import { validate } from '../middlewares/styleValidator.js';
-import { upload } from '../middlewares/upload.js'; // 여기서 upload 가져옴
+import { upload } from '../middlewares/formDataParser.js'; // 여기서 upload 가져옴
 import { hashPassword, verifyPassword } from '../middlewares/passwordValidator.js';
 import { CreateStyle, PatchStyle } from '../structs/styleStructs.js';
 import { createStyle, patchStyle, deleteStyle } from '../controllers/styleController.js';
@@ -31,5 +31,3 @@ router
   .get(getStyleCuration);
 
 export default router;
-
-// /styles/:styleId/curation로 들어오는 요청은 upload.single('image')거치고
