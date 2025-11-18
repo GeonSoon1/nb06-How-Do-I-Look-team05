@@ -8,31 +8,29 @@ import {
   patchStyle,
   deleteStyle,
   getStyleDetail,
-  getStyles
+  getStyle
 } from '../controllers/styleController.js';
 import { createStyleCuration, getStyleCuration } from '../controllers/curationController.js';
 import { CreateCuration } from '../structs/curationStructs.js';
 import { curationValidator } from '../middlewares/curationValidator.js';
+import { asyncHandler } from '../middlewares/asyncHandler.js';
+
 const router = express.Router();
 
 router
   .route('/')
-  .post(upload.array('images', 5), validate(CreateStyle), hashPassword, createStyle)
-  .get(getStyles);
+  .post(upload.array('images', 10), validate(CreateStyle), hashPassword, asyncHandler(createStyle))
+  .get(asyncHandler(getStyle));
 
 router
   .route('/:styleId')
-  .patch(upload.array('images', 5), validate(PatchStyle), verifyPassword, patchStyle)
-  .delete(upload.none(), verifyPassword, deleteStyle)
-  .get(getStyleDetail);
-
-// 큐레이팅 등록 (스타일별, 이미지 1장)
-// router.post('/:styleId/curation', upload.single('image'), createStyleCuration);
-// createStyleCuration에서 req.body + req.file을 사용
+  .patch(upload.array('images', 10), validate(PatchStyle), verifyPassword, asyncHandler(patchStyle))
+  .delete(upload.none(), verifyPassword, asyncHandler(deleteStyle))
+  .get(asyncHandler(getStyleDetail));
 
 router
   .route('/:styleId/curations')
-  .post(curationValidator(CreateCuration), hashPassword, createStyleCuration)
-  .get(getStyleCuration);
+  .post(curationValidator(CreateCuration), hashPassword, asyncHandler(createStyleCuration))
+  .get(asyncHandler(getStyleCuration));
 
 export default router;
