@@ -1,6 +1,5 @@
 import { prisma } from '../utils/prisma.js';
 
-
 // 큐레이팅 등록 http://localhost:3000/styles/{styleId}/curations
 export const createStyleCuration = async (req, res) => {
   const styleId = parseInt(req.params.styleId, 10);
@@ -32,7 +31,7 @@ export const createStyleCuration = async (req, res) => {
       where: { id: styleId },
       data: {
         curationCount: {
-          increment: 1   // Prisma에서 숫자 필드 +1 할 때 쓰는 문법
+          increment: 1 // Prisma에서 숫자 필드 +1 할 때 쓰는 문법
         }
       }
     });
@@ -42,8 +41,6 @@ export const createStyleCuration = async (req, res) => {
 
   res.status(200).send(curation);
 };
-
-
 
 // 큐레이팅 목록 조회 GET /styles/:styleId/curations
 export const getStyleCuration = async (req, res) => {
@@ -159,8 +156,6 @@ export const getStyleCuration = async (req, res) => {
   }
 };
 
-
-
 // 큐레이팅 수정 http://localhost:3000/curations/{curationId}
 export const updateCuration = async (req, res) => {
   //structError 400 Bad Request 처리 핸들러 필요.
@@ -211,7 +206,7 @@ export const deleteCuration = async (req, res) => {
         where: { id: styleId },
         data: {
           curationCount: {
-            decrement: 1   // 숫자 필드 -1
+            decrement: 1 // 숫자 필드 -1
           }
         }
       })

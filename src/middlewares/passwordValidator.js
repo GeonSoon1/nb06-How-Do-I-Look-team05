@@ -3,9 +3,11 @@ import { prisma } from '../utils/prisma.js';
 
 export const hashPassword = async (req, res, next) => {
   const { password } = req.body;
+
   if (!password) {
-    return next();
+    return res.status(400).json({ message: '비밀번호를 입력해주세요.' });
   }
+
   try {
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
@@ -55,7 +57,7 @@ export const verifyPassword = async (req, res, next) => {
 
     const isPasswordCorrect = await bcrypt.compare(password, modelId.password);
     if (!isPasswordCorrect) {
-      return res.status(401).json({ message: '비밀번호가 일치하지 않습니다.' });
+      return res.status(403).json({ message: '비밀번호가 일치하지 않습니다.' });
     }
 
     next();
