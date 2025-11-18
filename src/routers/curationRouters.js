@@ -6,7 +6,8 @@ import { commentValidator } from '../middlewares/commentValidator.js';
 import { PatchCuration } from '../structs/curationStructs.js';
 import { CreateComment } from '../structs/commentStructs.js';
 import { verifyPassword, verifyStylePassword } from '../middlewares/passwordValidator.js';
-
+import { textParser } from '../middlewares/formDataParser.js';
+import { asyncHandler } from '../middlewares/asyncHandler.js';
 const curationRouter = express.Router();
 
 curationRouter
@@ -16,6 +17,11 @@ curationRouter
 
 curationRouter
   .route('/:curationId/comments')
-  .post(commentValidator(CreateComment), verifyStylePassword, createComment);
+  .post(
+    textParser,
+    commentValidator(CreateComment),
+    verifyStylePassword,
+    asyncHandler(createComment)
+  );
 
 export default curationRouter;
