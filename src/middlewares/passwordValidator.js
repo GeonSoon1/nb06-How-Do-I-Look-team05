@@ -80,9 +80,11 @@ export const verifyStylePassword = async (req, res, next) => {
     }
 
     const isStylePasswordCorrect = await bcrypt.compare(password, isStylePassword);
+
     if (!isStylePasswordCorrect) {
       return res.status(400).json({ message: '잘못된 요청입니다' });
     }
+
     next();
   } catch (e) {
     next(e);
