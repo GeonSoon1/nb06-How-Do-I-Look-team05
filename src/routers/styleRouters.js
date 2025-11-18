@@ -3,8 +3,13 @@ import { validate } from '../middlewares/styleValidator.js';
 import { upload } from '../middlewares/formDataParser.js'; // 여기서 upload 가져옴
 import { hashPassword, verifyPassword } from '../middlewares/passwordValidator.js';
 import { CreateStyle, PatchStyle } from '../structs/styleStructs.js';
-import { createStyle, patchStyle, deleteStyle } from '../controllers/styleController.js';
-import { getStyleDetail, getStyles } from '../controllers/tagController.js';
+import {
+  createStyle,
+  patchStyle,
+  deleteStyle,
+  getStyleDetail,
+  getStyles
+} from '../controllers/styleController.js';
 import { createStyleCuration, getStyleCuration } from '../controllers/curationController.js';
 import { CreateCuration } from '../structs/curationStructs.js';
 import { curationValidator } from '../middlewares/curationValidator.js';
