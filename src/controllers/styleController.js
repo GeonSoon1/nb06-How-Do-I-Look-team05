@@ -118,10 +118,10 @@ export const getStyle = async (req, res, next) => {
     tag: { tags: { some: { tag: { contains: keyword } } } }
   };
   //태그로 조회
-  let where;
+  let where = undefined;
   if (tag) {
     where = { tags: { some: { tag: tag } } };
-  } else {
+  } else if (searchBy && keyword) {
     where = searchOption[searchBy] || undefined;
   }
 
@@ -186,7 +186,7 @@ export const getStyle = async (req, res, next) => {
       }, {});
       thing = {
         id: data[i]['id'],
-        thumbnail: data[i]['images'][0]['url'],
+        thumbnail: data[i]['images'][0]?.url,
         title: data[i]['title'],
         nickname: data[i]['nickname'],
         tags: data[i]['tags'].map((data) => data.tag),
@@ -259,7 +259,7 @@ export const getStyleDetail = async (req, res, next) => {
     createdAt: data['createdAt'],
     categories: spread,
     tag: data['tags'].map((tags) => tags.tag),
-    imageUrls: data['images'].map((images) => images.url)
+    imageUrls: data['images']?.map((images) => images.url)
   };
 
   res.status(200).send(response);

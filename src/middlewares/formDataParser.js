@@ -39,3 +39,5 @@ export const upload = multer({
   limits: { filesize: 10 * 2024 * 2024 }, //10MB
   fileFilter
 });
+
+export const textParser = multer().fields([]);
