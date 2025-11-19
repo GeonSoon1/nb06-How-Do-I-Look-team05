@@ -17,6 +17,7 @@ app.use('/ranking', rankingRouter);
 app.use('/curations', curationRouter);
 app.use('/tags', tagsRouter);
 app.use('/comments', commentRouter);
+app.use('/images', express.static('uploads'));
 
 app.use(errorHandler);
 
