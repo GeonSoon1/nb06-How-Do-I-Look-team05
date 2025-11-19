@@ -3,8 +3,8 @@ import { prisma } from '../utils/prisma.js';
 
 export const hashPassword = async (req, res, next) => {
   const { password } = req.body;
-  
-  // console.log('🔐 hashPassword input:', JSON.stringify(password), password?.length);
+
+  console.log('🔐 hashPassword input:', JSON.stringify(password), password?.length);
   if (!password) {
     return res.status(400).json({ message: '비밀번호를 입력해주세요.' });
   }
@@ -41,7 +41,7 @@ export const verifyPassword = async (req, res, next) => {
     const modelName = paramKey.replace('Id', '');
     const { password } = req.body;
 
-    // console.log('🔍 verifyPassword input:', { paramKey, id, modelName, password });
+    console.log('🔍 verifyPassword input:', { paramKey, id, modelName, password });
 
     if (!password) {
       return res.status(400).json({ message: '잘못된 요청입니다.' });
@@ -54,15 +54,15 @@ export const verifyPassword = async (req, res, next) => {
 
     const modelId = await config.model.findUnique({ where: { id } });
 
-    // console.log('🔍 DB row:', modelId);
+    console.log('🔍 DB row:', modelId);
 
     if (!modelId || !modelId.password) {
       return res.status(404).json({ message: config.notFoundMessage });
     }
 
     const isPasswordCorrect = await bcrypt.compare(password, modelId.password);
-    
-    // console.log('🔍 isPasswordCorrect:', isPasswordCorrect);
+
+    console.log('🔍 isPasswordCorrect:', isPasswordCorrect);
     if (!isPasswordCorrect) {
       return res.status(403).json({ message: '비밀번호가 틀렸습니다.' });
     }

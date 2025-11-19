@@ -160,7 +160,10 @@ erDiagram
 - Password Hashing: [bcrypt](https://www.npmjs.com/package/bcrypt)
 - File Handling: [Multer](https://www.npmjs.com/package/multer) for multipart/form-data
 - Validation: [superstruct](https://www.npmjs.com/package/superstruct) for request data validation
-- Dev Tools: [Nodemon](https://nodemon.io/) for auto-reloading, [ESLint](https://eslint.org/), [Prettier](https://prettier.io/) for code quality
+- Dev Tools:
+  - [Nodemon](https://nodemon.io/) for auto-reloading,
+  - [ESLint](https://eslint.org/),
+  - [Prettier](https://prettier.io/) for code quality
 
 ---
 
@@ -183,7 +186,7 @@ erDiagram
 2.  환경 변수 설정 (`.env`)
     프로젝트 루트에 `.env` 파일을 생성하고, 사용하는 PostgreSQL 데이터베이스 정보를 아래 형식에 맞게 입력합니다.
 
-    ```
+    ```bash
     # .env
     # PostgreSQL Connection URL
     # Format: postgresql://USER:PASSWORD@HOST:PORT/DATABASE?schema=public
@@ -237,4 +240,29 @@ erDiagram
 ├── .prettierrc           # Prettier 설정
 ├── app.js                # Express 애플리케이션의 진입점
 └── package.json          # 프로젝트 메타데이터 및 의존성 관리
+```
+
+## 배포 다이어그램
+
+```bash
+================================================================================
+                  배포다이어그램: How Do I Look
+================================================================================
+
+[사용자 영역]                         [서버 영역]
+
++--------------------------+     (인터넷)      +----------------------------------+
+|                          |                  |                                  |
+|    사용자 기기 (PC/모바일)   | --- HTTP/S --->  |           서버 (Node 1)           |
+|                          | <--- (API 응답) --|                                  |
+|  +-------------------+   |                  |  +----------------------------+  |
+|  | 웹 브라우저(postman) |   |                  |  | [배포된 소프트웨어 & 데이터]     |  |
+|  +-------------------+   |                  |  |                            |  |
+|                          |                  |  | - HowDoILook 앱 (app.js)   |  |
+|                          |                  |  | - PostgreSQL DB            |  |
+|                          |                  |  | - /uploads 폴더 (이미지)     |  |
+|                          |                  |  |                            |  |
+|                          |                  |  +----------------------------+  |
++--------------------------+                  +----------------------------------+
+
 ```
