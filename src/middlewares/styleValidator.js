@@ -16,7 +16,7 @@ export const validate = (schema) => {
         categories && typeof categories === 'string' ? JSON.parse(categories) : categories || {};
       const parsedTags = tags && typeof tags === 'string' ? JSON.parse(tags) : tags || [];
 
-      if (parseTags.length > 3) {
+      if (parsedTags.length > 3) {
         const error = new Error('태그는 최대 3개까지 추가할 수 있습니다.');
         error.statusCode = 400;
         throw error;

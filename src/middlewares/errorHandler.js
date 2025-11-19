@@ -1,4 +1,5 @@
 import multer from 'multer';
+import { Prisma } from '@prisma/client';
 
 export function errorHandler(err, _req, res, _next) {
   // 🔹 Multer에서 터진 에러인지 확인
@@ -25,7 +26,7 @@ export function errorHandler(err, _req, res, _next) {
   }
 
   if (err.name === 'StructError') {
-    return res.status(400).send({ message: err.message });
+    return res.status(400).send({ message: "잘못된 요청입니다" }); // 잘못된 요청입니다.
   } else if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2025') {
     return res.status(404).send({ message: '요청한 리소스를 찾을 수 없습니다.' });
   } else if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {

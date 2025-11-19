@@ -20,6 +20,3 @@ export const PatchCuration = s.object({
   costEffectiveness: s.max(s.min(s.number(), 0), 10)
 });
 
-// export const DeleteCuration = s.object({
-//   password: s.size(s.string())
-// });
