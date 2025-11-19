@@ -1,7 +1,6 @@
 import cors from 'cors';
 import express from 'express';
 import { PORT } from './utils/constants.js';
-import imageRouter from './routers/imageRouters.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import curationRouter from './routers/curationRouters.js';
 import styleRouter from './routers/styleRouters.js';
@@ -19,7 +18,6 @@ app.use('/ranking', rankingRouter);
 app.use('/curations', curationRouter);
 app.use('/tags', tagsRouter);
 app.use('/comments', commentRouter);
-app.use('/images', imageRouter);
 
 app.use(errorHandler);
 
