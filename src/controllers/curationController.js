@@ -1,6 +1,5 @@
 import { prisma } from '../utils/prisma.js';
 
-
 ////////// 큐레이팅 등록 http://localhost:3000/styles/{styleId}/curations //////////
 export const createStyleCuration = async (req, res) => {
   const styleId = parseInt(req.params.styleId, 10);
@@ -27,7 +26,7 @@ export const createStyleCuration = async (req, res) => {
       }
     });
 
-    // 2) 해당 style의 trendyAverage, uniqueAverage, practicalAverage, costEffectiveAverage 값을 가지고 온다. 
+    // 2) 해당 style의 trendyAverage, uniqueAverage, practicalAverage, costEffectiveAverage 값을 가지고 온다.
     const averages = await tx.style.findMany({
       where: { id: styleId },
       select: {
@@ -37,41 +36,54 @@ export const createStyleCuration = async (req, res) => {
         costEffectiveAverage: true,
         curationCount: true
       }
-    })
-
+    });
 
     // 3) 각 점수를 style모델에서 update 해줘야한다.
     // {(평균점수 * count수) + 새로운 값} / count+1)
-    const average = averages[0]
+    const average = averages[0];
     const updated_score = await tx.style.update({
       where: { id: styleId },
       data: {
-        curationCount : {
+        curationCount: {
           increment: 1
         },
-        trendyAverage: (Number(average["trendyAverage"]) * (Number(average["curationCount"])) + Number(created["trendy"]))/ (Number(average["curationCount"]+1)),
-        uniqueAverage: (Number(average["uniqueAverage"]) * (Number(average["curationCount"])) + Number(created["personality"]))/ Number((average["curationCount"]+1)),
-        practicalAverage: (Number(average["practicalAverage"]) * (Number(average["curationCount"])) + Number(created["practicality"]))/ Number((average["curationCount"]+1)),
-        costEffectiveAverage: (Number(average["costEffectiveAverage"]) * (Number(average["curationCount"])) + Number(created["costEffectiveness"])) / (Number(average["curationCount"]+1))
+        trendyAverage:
+          (Number(average['trendyAverage']) * Number(average['curationCount']) +
+            Number(created['trendy'])) /
+          Number(average['curationCount'] + 1),
+        uniqueAverage:
+          (Number(average['uniqueAverage']) * Number(average['curationCount']) +
+            Number(created['personality'])) /
+          Number(average['curationCount'] + 1),
+        practicalAverage:
+          (Number(average['practicalAverage']) * Number(average['curationCount']) +
+            Number(created['practicality'])) /
+          Number(average['curationCount'] + 1),
+        costEffectiveAverage:
+          (Number(average['costEffectiveAverage']) * Number(average['curationCount']) +
+            Number(created['costEffectiveness'])) /
+          Number(average['curationCount'] + 1)
       }
-    })
+    });
     // console.log(updated_score)
-    
 
     //4) style모델의 totalAverage도 update 해줘야한다.
     const final_data = await tx.style.update({
       where: { id: styleId },
       data: {
-        totalAverage: (Number(updated_score["trendyAverage"]) + Number(updated_score["uniqueAverage"]) + Number(updated_score["practicalAverage"]) + Number(updated_score["costEffectiveAverage"])) / (4)
+        totalAverage:
+          (Number(updated_score['trendyAverage']) +
+            Number(updated_score['uniqueAverage']) +
+            Number(updated_score['practicalAverage']) +
+            Number(updated_score['costEffectiveAverage'])) /
+          4
       }
-    })
-    // console.log(final_data)
+    });
+
     return created;
   });
   res.status(200).send(curation);
 };
-
-
 
 ////////// 큐레이팅 목록 조회 GET /styles/:styleId/curations //////////
 export const getStyleCuration = async (req, res) => {
@@ -187,8 +199,6 @@ export const getStyleCuration = async (req, res) => {
   });
 };
 
-
-
 ////////// 큐레이팅 수정 http://localhost:3000/curations/{curationId} //////////
 // 수정 -> 원래 curationId의 점수를 평균에서 빼고 새로운 점수로 다시 평균 내기
 export const updateCuration = async (req, res) => {
@@ -273,15 +283,11 @@ export const updateCuration = async (req, res) => {
       (Number(style.trendyAverage) * count - existing.trendy + newCuration.trendy) / count;
 
     const newUniqueAvg =
-      (Number(style.uniqueAverage) * count -
-        existing.personality +
-        newCuration.personality) /
+      (Number(style.uniqueAverage) * count - existing.personality + newCuration.personality) /
       count;
 
     const newPracticalAvg =
-      (Number(style.practicalAverage) * count -
-        existing.practicality +
-        newCuration.practicality) /
+      (Number(style.practicalAverage) * count - existing.practicality + newCuration.practicality) /
       count;
 
     const newCostAvg =
@@ -290,8 +296,7 @@ export const updateCuration = async (req, res) => {
         newCuration.costEffectiveness) /
       count;
 
-    const totalAverageValue =
-      (newTrendyAvg + newUniqueAvg + newPracticalAvg + newCostAvg) / count;
+    const totalAverageValue = (newTrendyAvg + newUniqueAvg + newPracticalAvg + newCostAvg) / 4; // <- 이부분 '4'로 수정필요
 
     await tx.style.update({
       where: { id: styleId },
@@ -309,7 +314,6 @@ export const updateCuration = async (req, res) => {
 
   res.status(200).send(updated_curation);
 };
-
 
 // 큐레이팅 삭제 http://localhost:3000/curations/{curationId}
 // 삭제 -> 해당 curationId의 점수를 평균에서 빼고, 다시 평균 구하기
@@ -379,22 +383,16 @@ export const deleteCuration = async (req, res) => {
     let newTotalAvg = 0;
 
     if (newCount > 0) {
-      newTrendyAvg =
-        (Number(style.trendyAverage) * count - existing.trendy) / newCount;
+      newTrendyAvg = (Number(style.trendyAverage) * count - existing.trendy) / newCount;
 
-      newUniqueAvg =
-        (Number(style.uniqueAverage) * count - existing.personality) / newCount;
+      newUniqueAvg = (Number(style.uniqueAverage) * count - existing.personality) / newCount;
 
-      newPracticalAvg =
-        (Number(style.practicalAverage) * count - existing.practicality) / newCount;
+      newPracticalAvg = (Number(style.practicalAverage) * count - existing.practicality) / newCount;
 
       newCostAvg =
-        (Number(style.costEffectiveAverage) * count -
-          existing.costEffectiveness) /
-        newCount;
+        (Number(style.costEffectiveAverage) * count - existing.costEffectiveness) / newCount;
 
-      newTotalAvg =
-        (newTrendyAvg + newUniqueAvg + newPracticalAvg + newCostAvg) / newCount;
+      newTotalAvg = (newTrendyAvg + newUniqueAvg + newPracticalAvg + newCostAvg) / 4; // <- 이 부분도 '4'로 수정 필요
     }
 
     await tx.curation.delete({
