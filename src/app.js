@@ -1,6 +1,5 @@
 import cors from 'cors';
 import express from 'express';
-import { PORT } from './utils/constants.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import curationRouter from './routers/curationRouters.js';
 import styleRouter from './routers/styleRouters.js';
@@ -21,7 +20,9 @@ app.use('/comments', commentRouter);
 
 app.use(errorHandler);
 
-// listener
-app.listen(PORT || 3000, () => console.log(`Server listening on port ${PORT}!`));
+const PORT = process.env.PORT || 3000;
 
+app.listen(PORT, () => {
+  console.log(`Server listening on port ${PORT}!`);
+});
 export default app;
