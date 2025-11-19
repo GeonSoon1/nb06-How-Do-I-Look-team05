@@ -22,7 +22,7 @@
   "type": "module",
   "scripts": {
     "dev": "clear; nodemon src/app.js",
-    "start": "clear; node app.js"
+    "start": "clear; node src/app.js"
   },
   "prisma": {
     "seed": "node prisma/seed.js"
