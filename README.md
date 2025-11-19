@@ -43,7 +43,7 @@
 - 프로젝트의 데이터베이스 관계는 아래와 같습니다.
 - 스키마는 `prisma/schema.prisma` 파일에 상세히 정의되어 있습니다.
 
-```mermaid
+```bash
 erDiagram
     Style ||--o{ Image : "has"
     Style ||--o{ Item : "has"
