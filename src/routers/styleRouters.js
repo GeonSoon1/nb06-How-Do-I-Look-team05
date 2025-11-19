@@ -15,7 +15,6 @@ import { CreateCuration } from '../structs/curationStructs.js';
 import { curationValidator } from '../middlewares/curationValidator.js';
 import { asyncHandler } from '../middlewares/asyncHandler.js';
 
-
 const router = express.Router();
 
 router
@@ -31,7 +30,12 @@ router
 
 router
   .route('/:styleId/curations')
-  .post(upload.none(), curationValidator(CreateCuration), hashPassword, asyncHandler(createStyleCuration))
+  .post(
+    upload.none(),
+    curationValidator(CreateCuration),
+    hashPassword,
+    asyncHandler(createStyleCuration)
+  )
   .get(asyncHandler(getStyleCuration));
 
 export default router;
