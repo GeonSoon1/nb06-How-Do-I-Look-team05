@@ -242,7 +242,7 @@ erDiagram
 ```mermaid
 erDiagram
     Style {
-        int id PK "Style ID"
+        int id PK
         string nickname
         string title
         string content
@@ -259,21 +259,17 @@ erDiagram
     }
 
     Item {
-        int id PK "Item ID"
+        int id PK
         string itemName
         string brandName
         Decimal price
-        Category category "Enum: top, bottom, etc."
-        int styleId FK "Foreign Key to Style"
-    }
-
-    Category {
-        enum type "top, bottom, outer, dress, shoes, bag, accessory"
+        string category "Enum: top, bottom, etc."
+        int styleId FK
     }
 
     Tag {
-        int id PK "Tag ID"
-        string tag "Unique tag name"
+        int id PK
+        string tag UK
         int styleCount
         int clickCount
         datetime createdAt
@@ -281,16 +277,16 @@ erDiagram
     }
 
     Image {
-        int id PK "Image ID"
-        string url "Image URL"
+        int id PK
+        string url
         boolean isThumbnail
         datetime createdAt
         datetime updatedAt
-        int styleId FK "Foreign Key to Style"
+        int styleId FK
     }
 
     Curation {
-        int id PK "Curation ID"
+        int id PK
         int trendy
         int personality
         int practicality
@@ -300,31 +296,30 @@ erDiagram
         string password
         datetime createdAt
         datetime updatedAt
-        int styleId FK "Foreign Key to Style"
+        int styleId FK
     }
 
     CurationComment {
-        int id PK "Comment ID"
+        int id PK
         string content
         string password
         datetime createdAt
         datetime updatedAt
-        int curationId FK "Foreign Key to Curation (Unique)"
-        int styleId FK "Foreign Key to Style"
+        int curationId UK_FK
+        int styleId FK
     }
 
     LineImage {
         int id PK
-        int lineId "Unique Line ID"
+        int lineId UK
         string url
         datetime createdAt
     }
 
-    'Style' o|--|{ 'Item' : "contains"
-    'Style' o|--|{ 'Image' : "has"
-    'Style' o|--|{ 'Curation' : "receives"
-    'Style' o|--|{ 'CurationComment' : "has"
-    'Style' }o--o{ 'Tag' : "is tagged with"
-    'Curation' ||--|| 'CurationComment' : "has one"
-    'Item' o|--|| 'Category' : "is categorized as"
+    Style ||--o{ Item : "contains"
+    Style ||--o{ Image : "has"
+    Style ||--o{ Curation : "receives"
+    Style ||--o{ CurationComment : "has"
+    Style }o--o{ Tag : "is_tagged_with"
+    Curation ||--|| CurationComment : "has_one"
 ```
