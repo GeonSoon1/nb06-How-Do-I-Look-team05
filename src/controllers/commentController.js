@@ -1,41 +1,55 @@
 import { prisma } from '../utils/prisma.js';
 
 // 등록
-export const createComment = async (req, res) => {
+export const createComment = async (req, res, next) => {
   const curationId = parseInt(req.params.curationId, 10);
-  const commentData = req.body;
-  const comment = await prisma.curationComment.create({
-    data: {
-      ...commentData,
-      curation: {
-        connect: { id: curationId }
+  const { content } = req.body;
+  // 건순: curation테이블에서 curationId가 일치하는 row의 styleId를 가지고 와볼까  -> 민혁 : nc idea
+
+  const comment = await prisma.$transaction(async (tx) => {
+    const curation = await tx.curation.findUniqueOrThrow({
+      where: { id: curationId }
+    });
+    const styleId = curation['styleId'];
+    const style = await tx.style.findUniqueOrThrow({
+      where: { id: styleId }
+    });
+    const stylePassword = style['password'];
+
+    const comment = await tx.curationComment.create({
+      data: {
+        content,
+        password: stylePassword,
+        curation: {
+          connect: { id: curationId }
+        },
+        style: {
+          connect: { id: styleId }
+        }
+      },
+      select: {
+        id: true,
+        style: { select: { nickname: true } },
+        content: true,
+        createdAt: true
       }
-    },
-    select: {
-      id: true,
-      content: true,
-      createdAt: true
-    }
+    });
+    return comment;
   });
 
-  res.status(200).send(comment);
+  const response = {
+    id: comment['id'],
+    nickname: comment['style']['nickname'],
+    content: comment['content'],
+    createdAt: comment['createdAt']
+  };
+  res.status(200).send(response);
 };
 
 // 업데이트
-export const patchComment = async (req, res) => {
+export const patchComment = async (req, res, next) => {
   const commentId = parseInt(req.params.commentId, 10);
-  const { content, password } = req.body;
-  //비밀번호 검증
-  const existing = await prisma.curationComment.findUniqueOrThrow({
-    where: { id: commentId }
-  });
-  if (!existing) {
-    res.status(404).send({ message: '존재하지 않습니다' });
-  }
-
-  if (password !== existing.password) {
-    res.status(403).send({ message: '비밀번호가 틀렸습니다' });
-  }
+  const { content } = req.body;
 
   const comment = await prisma.curationComment.update({
     where: { id: commentId },
@@ -44,23 +58,26 @@ export const patchComment = async (req, res) => {
     },
     select: {
       id: true,
+      style: { select: { nickname: true } },
       content: true,
       createdAt: true
     }
   });
-  res.status(200).send(comment);
+  const response = {
+    id: comment['id'],
+    nickname: comment['style']['nickname'],
+    content: comment['content'],
+    createdAt: comment['createdAt']
+  };
+  res.status(200).send(response);
 };
 
 // 삭제
-export const deleteComment = async (req, res) => {
-  try {
-    const commentId = Number(req.params.commentId);
-    console.log(commentId);
-    const comment = await prisma.curationComment.delete({
-      where: { id: commentId }
-    });
-    res.status(200).send(comment);
-  } catch (err) {
-    next(err);
-  }
+export const deleteComment = async (req, res, next) => {
+  const commentId = Number(req.params.commentId);
+  const comment = await prisma.curationComment.delete({
+    where: { id: commentId }
+  });
+  // res.status(200).send(comment);
+  return res.status(200).send({ message: '답글 삭제 성공' })
 };

@@ -1,6 +1,6 @@
 import { prisma } from '../utils/prisma.js';
 
-export const getRanking = async (req, res) => {
+export const getRanking = async (req, res, next) => {
   const { page = '1', pageSize = '12', rankBy } = req.query;
   const rankByOption = {
     total: [{ totalAverage: 'desc' }, { viewCount: 'desc' }],
@@ -64,7 +64,7 @@ export const getRanking = async (req, res) => {
       }, {});
       thing = {
         id: ranking[i]['id'],
-        thumbnail: ranking[i]['images'][0]['url'],
+        thumbnail: ranking[i]['images'][0]?.url,
         nickname: ranking[i]['nickname'],
         title: ranking[i]['title'],
         tags: ranking[i]['tags'].map((tags) => tags.tag),

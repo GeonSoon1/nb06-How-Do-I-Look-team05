@@ -1,5 +1,3 @@
-// 폼데이터 파싱 : 이미지 + 텍스트 병합 요청 처리
-
 import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
@@ -41,3 +39,5 @@ export const upload = multer({
   limits: { filesize: 10 * 2024 * 2024 }, //10MB
   fileFilter
 });
+
+export const textParser = multer().fields([]);
