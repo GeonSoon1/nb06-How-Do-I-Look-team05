@@ -160,7 +160,10 @@ erDiagram
 - Password Hashing: [bcrypt](https://www.npmjs.com/package/bcrypt)
 - File Handling: [Multer](https://www.npmjs.com/package/multer) for multipart/form-data
 - Validation: [superstruct](https://www.npmjs.com/package/superstruct) for request data validation
-- Dev Tools: [Nodemon](https://nodemon.io/) for auto-reloading, [ESLint](https://eslint.org/), [Prettier](https://prettier.io/) for code quality
+- Dev Tools:
+  - [Nodemon](https://nodemon.io/) for auto-reloading,
+  - [ESLint](https://eslint.org/),
+  - [Prettier](https://prettier.io/) for code quality
 
 ---
 
@@ -183,7 +186,7 @@ erDiagram
 2.  환경 변수 설정 (`.env`)
     프로젝트 루트에 `.env` 파일을 생성하고, 사용하는 PostgreSQL 데이터베이스 정보를 아래 형식에 맞게 입력합니다.
 
-    ```
+    ```bash
     # .env
     # PostgreSQL Connection URL
     # Format: postgresql://USER:PASSWORD@HOST:PORT/DATABASE?schema=public
