@@ -6,14 +6,16 @@ import { commentValidator } from '../middlewares/commentValidator.js';
 import { PatchCuration } from '../structs/curationStructs.js';
 import { CreateComment } from '../structs/commentStructs.js';
 import { verifyPassword, verifyStylePassword } from '../middlewares/passwordValidator.js';
-import { upload } from '../middlewares/formDataParser.js'; // 여기서 upload 가져옴
+import { upload, textParser } from '../middlewares/formDataParser.js'; // 여기서 upload 가져옴
+import { asyncHandler } from '../middlewares/asyncHandler.js';
+
 
 const curationRouter = express.Router();
 
 curationRouter
   .route('/:curationId')
-  .put(upload.none(), curationValidator(PatchCuration), verifyPassword, updateCuration)
-  .delete(upload.none(), verifyPassword, deleteCuration);
+  .put(upload.none(), curationValidator(PatchCuration), verifyPassword, asyncHandler(updateCuration))
+  .delete(upload.none(), verifyPassword, asyncHandler(deleteCuration));
 
 curationRouter
   .route('/:curationId/comments')

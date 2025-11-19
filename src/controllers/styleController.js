@@ -98,7 +98,8 @@ export const deleteStyle = async (req, res, next) => {
   const deletedStyle = await prisma.style.delete({
     where: { id: styleId }
   });
-  res.status(200).send(deletedStyle);
+  // res.status(200).send(deletedStyle);
+  return res.status(200).send({ message: '스타일 삭제 성공' })
 };
 
 //스타일 목록 조회===
@@ -263,4 +264,5 @@ export const getStyleDetail = async (req, res, next) => {
   };
 
   res.status(200).send(response);
+  
 };

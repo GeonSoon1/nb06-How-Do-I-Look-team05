@@ -78,5 +78,6 @@ export const deleteComment = async (req, res, next) => {
   const comment = await prisma.curationComment.delete({
     where: { id: commentId }
   });
-  res.status(200).send(comment);
+  // res.status(200).send(comment);
+  return res.status(200).send({ message: '답글 삭제 성공' })
 };

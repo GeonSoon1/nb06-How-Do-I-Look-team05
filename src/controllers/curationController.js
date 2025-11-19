@@ -65,7 +65,7 @@ export const createStyleCuration = async (req, res) => {
         totalAverage: (Number(updated_score["trendyAverage"]) + Number(updated_score["uniqueAverage"]) + Number(updated_score["practicalAverage"]) + Number(updated_score["costEffectiveAverage"])) / (4)
       }
     })
-    console.log(final_data)
+    // console.log(final_data)
     return created;
   });
   res.status(200).send(curation);
@@ -82,17 +82,23 @@ export const getStyleCuration = async (req, res) => {
   const pageSizeNum = parseInt(pageSize, 10);
 
   // 1) 기본 형식 검증 (잘못된 요청이면 400)
-  if (Number.isNaN(styleId) || Number.isNaN(pageNum) || Number.isNaN(pageSizeNum)) {
-    return res.status(400).json({ message: '잘못된 요청입니다' });
+  if (
+    Number.isNaN(styleId) ||
+    Number.isNaN(pageNum) ||
+    Number.isNaN(pageSizeNum) ||
+    pageNum <= 0 ||
+    pageSizeNum <= 0
+  ) {
+    const error = new Error('잘못된 요청입니다');
+    error.status = 400;
+    throw error;
   }
 
-  if (pageNum <= 0 || pageSizeNum <= 0) {
-    return res.status(400).json({ message: '잘못된 요청입니다' });
-  }
-
-  // searchBy가 들어왔다면 nickname 또는 content만 허용하고 싶다면:
+  // searchBy가 들어왔다면 nickname 또는 content만 허용
   if (searchBy && searchBy !== 'nickname' && searchBy !== 'content') {
-    return res.status(400).json({ message: '잘못된 요청입니다' });
+    const error = new Error('잘못된 요청입니다');
+    error.status = 400;
+    throw error;
   }
 
   // 2) 검색 조건 만들기
@@ -108,7 +114,6 @@ export const getStyleCuration = async (req, res) => {
         content: { contains: keyword, mode: 'insensitive' }
       };
     } else {
-      // searchBy 없으면 둘 다
       searchCondition = {
         OR: [
           { nickname: { contains: keyword, mode: 'insensitive' } },
@@ -123,68 +128,63 @@ export const getStyleCuration = async (req, res) => {
     ...searchCondition
   };
 
-  try {
-    const totalItemCount = await prisma.curation.count({ where });
+  // 여기부터는 try/catch 필요 없음. 에러 나면 asyncHandler → errorHandler로 감.
+  const totalItemCount = await prisma.curation.count({ where });
 
-    const curations = await prisma.curation.findMany({
-      where,
-      skip: (pageNum - 1) * pageSizeNum,
-      take: pageSizeNum,
-      orderBy: { createdAt: 'desc' },
-      select: {
-        id: true,
-        nickname: true,
-        content: true,
-        trendy: true,
-        personality: true,
-        practicality: true,
-        costEffectiveness: true,
-        createdAt: true,
-        style: {
-          select: {
-            nickname: true
-          }
-        },
-        curationComment: {
-          select: {
-            id: true,
-            content: true,
-            createdAt: true
-          }
+  const curations = await prisma.curation.findMany({
+    where,
+    skip: (pageNum - 1) * pageSizeNum,
+    take: pageSizeNum,
+    orderBy: { createdAt: 'desc' },
+    select: {
+      id: true,
+      nickname: true,
+      content: true,
+      trendy: true,
+      personality: true,
+      practicality: true,
+      costEffectiveness: true,
+      createdAt: true,
+      style: {
+        select: {
+          nickname: true
+        }
+      },
+      curationComment: {
+        select: {
+          id: true,
+          content: true,
+          createdAt: true
         }
       }
-    });
+    }
+  });
 
-    const data = curations.map((c) => ({
-      id: c.id,
-      nickname: c.nickname,
-      content: c.content,
-      trendy: c.trendy,
-      personality: c.personality,
-      practicality: c.practicality,
-      costEffectiveness: c.costEffectiveness,
-      createdAt: c.createdAt,
-      comment: c.curationComment
-        ? {
-            id: c.curationComment.id,
-            nickname: c.style.nickname,
-            content: c.curationComment.content,
-            createdAt: c.curationComment.createdAt
-          }
-        : {}
-    }));
+  const data = curations.map((c) => ({
+    id: c.id,
+    nickname: c.nickname,
+    content: c.content,
+    trendy: c.trendy,
+    personality: c.personality,
+    practicality: c.practicality,
+    costEffectiveness: c.costEffectiveness,
+    createdAt: c.createdAt,
+    comment: c.curationComment
+      ? {
+          id: c.curationComment.id,
+          nickname: c.style.nickname,
+          content: c.curationComment.content,
+          createdAt: c.curationComment.createdAt
+        }
+      : {}
+  }));
 
-    return res.status(200).json({
-      currentPage: pageNum,
-      totalPages: Math.ceil(totalItemCount / pageSizeNum),
-      totalItemCount,
-      data
-    });
-  } catch (err) {
-    console.error(err);
-    // 여기까지 왔으면 진짜 서버 쪽 문제라 500
-    return res.status(500).json({ message: 'Internal Server Error' });
-  }
+  return res.status(200).json({
+    currentPage: pageNum,
+    totalPages: Math.ceil(totalItemCount / pageSizeNum),
+    totalItemCount,
+    data
+  });
 };
 
 
@@ -193,116 +193,122 @@ export const getStyleCuration = async (req, res) => {
 // 수정 -> 원래 curationId의 점수를 평균에서 빼고 새로운 점수로 다시 평균 내기
 export const updateCuration = async (req, res) => {
   const curationId = parseInt(req.params.curationId, 10);
-  const { password, ...rest } = req.body; // password는 미들웨어에서 검증했다고 가정
+  const { password, ...rest } = req.body; // 비밀번호 검증은 verifyPassword에서 이미 처리 완료
 
-  try {
-    const updated_curation = await prisma.$transaction(async (tx) => {
-      // 1) 기존 큐레이션 + styleId + 예전 점수들 가져오기
-      const existing = await tx.curation.findUnique({
-        where: { id: curationId },
-        select: {
-          id: true,
-          styleId: true,
-          trendy: true,
-          personality: true,       // uniqueAverage에 해당
-          practicality: true,
-          costEffectiveness: true,
-        }
-      });
+  // curationId 형식 오류 → 400
+  if (Number.isNaN(curationId) || curationId <= 0) {
+    const error = new Error('잘못된 요청입니다');
+    error.status = 400;
+    throw error;
+  }
 
-      if (!existing) {
-        // 프로젝트에서 쓰는 에러 형식에 맞춰서 처리하면 됨
-        throw new Error('NotFoundCuration');
+  const updated_curation = await prisma.$transaction(async (tx) => {
+    // 1) 기존 큐레이션 조회
+    const existing = await tx.curation.findUnique({
+      where: { id: curationId },
+      select: {
+        id: true,
+        styleId: true,
+        trendy: true,
+        personality: true,
+        practicality: true,
+        costEffectiveness: true
       }
-
-      const styleId = existing.styleId;
-
-
-      // 2) 큐레이션 점수/내용 수정
-      const newCuration = await tx.curation.update({
-        where: { id: curationId },
-        data: rest,  // nickname, content, trendy, personality, practicality, costEffectiveness 등
-        select: {
-          id: true,
-          nickname: true,
-          content: true,
-          trendy: true,
-          personality: true,
-          practicality: true,
-          costEffectiveness: true,
-          createdAt: true
-        }
-      });
-
-      // 3) style의 현재 평균값 + curationCount 가져오기
-      const style = await tx.style.findUnique({
-        where: { id: styleId },
-        select: {
-          trendyAverage: true,
-          uniqueAverage: true,
-          practicalAverage: true,
-          costEffectiveAverage: true,
-          curationCount: true
-        }
-      });
-
-      if (!style) {
-        throw new Error('NotFoundStyle');
-      }
-
-      const count = Number(style.curationCount);
-      // count가 0이면 나누기 에러 방지
-      if (count <= 0) {
-        // 이 경우엔 그냥 평균을 새 점수로 세팅하는 쪽으로 가도 됨
-        // 근데 정상 흐름이라면 count >= 1일 거라서, 여기서는 단순히 예외만 던짐
-        throw new Error('InvalidCurationCount');
-      }
-
-      // 4) 각 평균 재계산: (현재 평균 * 개수 - 옛 점수 + 새 점수) / 개수
-      const newTrendyAvg =
-        ((Number(style.trendyAverage) * count) - existing.trendy + newCuration.trendy) / count;
-
-      const newUniqueAvg =
-        ((Number(style.uniqueAverage) * count) - existing.personality + newCuration.personality) / count;
-
-      const newPracticalAvg =
-        ((Number(style.practicalAverage) * count) - existing.practicality + newCuration.practicality) / count;
-
-      const newCostAvg =
-        ((Number(style.costEffectiveAverage) * count) - existing.costEffectiveness + newCuration.costEffectiveness) / count;
-
-      // 5) totalAverage 재계산
-      // 너가 create에서 쓰던 공식이
-      // (trendyAverage + uniqueAverage + practicalAverage + costEffectiveAverage) / curationCount
-      // 라서 여기도 그 방식 그대로 맞춰 놓음
-      const totalAverageValue =
-        (newTrendyAvg + newUniqueAvg + newPracticalAvg + newCostAvg) / count;
-
-      // 6) style 테이블 업데이트
-      const updated_style = await tx.style.update({
-        where: { id: styleId },
-        data: {
-          trendyAverage: newTrendyAvg,
-          uniqueAverage: newUniqueAvg,
-          practicalAverage: newPracticalAvg,
-          costEffectiveAverage: newCostAvg,
-          totalAverage: totalAverageValue
-        }
-      });
-
-      // 최종 응답은 수정된 큐레이션으로
-      console.log(updated_style)
-      return newCuration;
     });
 
-    res.status(200).send(updated_curation);
-  } catch (err) {
-    console.error(err);
-    // 프로젝트 공통 에러 핸들링 방식 있으면 그거로 바꾸면 됨
-    res.status(500).json({ message: 'Internal Server Error' });
-  }
-};
+    // 없는 큐레이션 → 404
+    if (!existing) {
+      const error = new Error('존재하지 않습니다');
+      error.status = 404;
+      throw error;
+    }
 
+    const styleId = existing.styleId;
+
+    // 2) 큐레이션 내용/점수 수정
+    const newCuration = await tx.curation.update({
+      where: { id: curationId },
+      data: rest,
+      select: {
+        id: true,
+        nickname: true,
+        content: true,
+        trendy: true,
+        personality: true,
+        practicality: true,
+        costEffectiveness: true,
+        createdAt: true
+      }
+    });
+
+    // 3) style의 현재 평균값 + curationCount 가져오기
+    const style = await tx.style.findUnique({
+      where: { id: styleId },
+      select: {
+        trendyAverage: true,
+        uniqueAverage: true,
+        practicalAverage: true,
+        costEffectiveAverage: true,
+        curationCount: true
+      }
+    });
+
+    // 없는 style → 404
+    if (!style) {
+      const error = new Error('존재하지 않습니다');
+      error.status = 404;
+      throw error;
+    }
+
+    const count = Number(style.curationCount);
+
+    if (count <= 0) {
+      const error = new Error('잘못된 요청입니다');
+      error.status = 400;
+      throw error;
+    }
+
+    // 4) 평균 재계산
+    const newTrendyAvg =
+      (Number(style.trendyAverage) * count - existing.trendy + newCuration.trendy) / count;
+
+    const newUniqueAvg =
+      (Number(style.uniqueAverage) * count -
+        existing.personality +
+        newCuration.personality) /
+      count;
+
+    const newPracticalAvg =
+      (Number(style.practicalAverage) * count -
+        existing.practicality +
+        newCuration.practicality) /
+      count;
+
+    const newCostAvg =
+      (Number(style.costEffectiveAverage) * count -
+        existing.costEffectiveness +
+        newCuration.costEffectiveness) /
+      count;
+
+    const totalAverageValue =
+      (newTrendyAvg + newUniqueAvg + newPracticalAvg + newCostAvg) / count;
+
+    await tx.style.update({
+      where: { id: styleId },
+      data: {
+        trendyAverage: newTrendyAvg,
+        uniqueAverage: newUniqueAvg,
+        practicalAverage: newPracticalAvg,
+        costEffectiveAverage: newCostAvg,
+        totalAverage: totalAverageValue
+      }
+    });
+
+    return newCuration;
+  });
+
+  res.status(200).send(updated_curation);
+};
 
 
 // 큐레이팅 삭제 http://localhost:3000/curations/{curationId}
@@ -310,108 +316,103 @@ export const updateCuration = async (req, res) => {
 export const deleteCuration = async (req, res) => {
   const curationId = parseInt(req.params.curationId, 10);
 
-  try {
-    await prisma.$transaction(async (tx) => {
-      // 1) 삭제할 큐레이팅의 styleId + 기존 점수들 조회
-      const existing = await tx.curation.findUnique({
-        where: { id: curationId },
-        select: {
-          id: true,
-          styleId: true,
-          trendy: true,
-          personality: true,       // uniqueAverage에 대응
-          practicality: true,
-          costEffectiveness: true,
-        }
-      });
+  // id 형식이 이상하면 여기서 400
+  if (Number.isNaN(curationId) || curationId <= 0) {
+    const error = new Error('잘못된 요청입니다');
+    error.status = 400;
+    throw error;
+  }
 
-      if (!existing) {
-        throw new Error('NOT_FOUND_CURATION');
+  await prisma.$transaction(async (tx) => {
+    // 1) 삭제할 큐레이팅 조회
+    const existing = await tx.curation.findUnique({
+      where: { id: curationId },
+      select: {
+        id: true,
+        styleId: true,
+        trendy: true,
+        personality: true,
+        practicality: true,
+        costEffectiveness: true
       }
-
-      const styleId = existing.styleId;
-
-      // 2) style의 현재 평균값 + curationCount 조회
-      const style = await tx.style.findUnique({
-        where: { id: styleId },
-        select: {
-          trendyAverage: true,
-          uniqueAverage: true,
-          practicalAverage: true,
-          costEffectiveAverage: true,
-          curationCount: true
-        }
-      });
-
-      if (!style) {
-        throw new Error('NOT_FOUND_STYLE');
-      }
-
-      const count = Number(style.curationCount);
-      const newCount = count - 1;
-
-      if (newCount < 0) {
-        throw new Error('INVALID_CURATION_COUNT');
-      }
-
-      let newTrendyAvg = 0;
-      let newUniqueAvg = 0;
-      let newPracticalAvg = 0;
-      let newCostAvg = 0;
-      let newTotalAvg = 0;
-
-      // 3) 남아 있는 큐레이션이 1개 이상일 때만 다시 평균 계산
-      //    (count == 1 이었다면, 삭제 후엔 평균들을 0으로 초기화)
-      if (newCount > 0) {
-        newTrendyAvg =
-          ((Number(style.trendyAverage) * count) - existing.trendy) / newCount;
-
-        newUniqueAvg =
-          ((Number(style.uniqueAverage) * count) - existing.personality) / newCount;
-
-        newPracticalAvg =
-          ((Number(style.practicalAverage) * count) - existing.practicality) / newCount;
-
-        newCostAvg =
-          ((Number(style.costEffectiveAverage) * count) - existing.costEffectiveness) / newCount;
-
-        // create에서 쓰던 공식 따라감:
-        // (trendyAverage + uniqueAverage + practicalAverage + costEffectiveAverage) / curationCount
-        newTotalAvg =
-          (newTrendyAvg + newUniqueAvg + newPracticalAvg + newCostAvg) / newCount;
-      }
-
-      // 4) 큐레이팅 삭제
-      await tx.curation.delete({
-        where: { id: curationId }
-      });
-
-      // 5) style의 평균값 + curationCount 업데이트
-      const updated_style = await tx.style.update({
-        where: { id: styleId },
-        data: {
-          curationCount: newCount,
-          trendyAverage: newTrendyAvg,
-          uniqueAverage: newUniqueAvg,
-          practicalAverage: newPracticalAvg,
-          costEffectiveAverage: newCostAvg,
-          totalAverage: newTotalAvg
-        }
-      });
-      console.log(updated_style)
     });
 
-    return res.status(200).send({ message: '큐레이팅 삭제 성공' });
-  } catch (err) {
-    console.error(err);
-
-    if (err.message === 'NOT_FOUND_CURATION') {
-      return res.status(404).send({ message: '큐레이팅이 존재하지 않습니다.' });
-    }
-    if (err.message === 'NOT_FOUND_STYLE') {
-      return res.status(404).send({ message: '스타일이 존재하지 않습니다.' });
+    if (!existing) {
+      const error = new Error('존재하지 않습니다');
+      error.status = 404;
+      throw error;
     }
 
-    return res.status(500).send({ message: 'Internal Server Error' });
-  }
+    const styleId = existing.styleId;
+
+    // 2) style 정보 조회
+    const style = await tx.style.findUnique({
+      where: { id: styleId },
+      select: {
+        trendyAverage: true,
+        uniqueAverage: true,
+        practicalAverage: true,
+        costEffectiveAverage: true,
+        curationCount: true
+      }
+    });
+
+    if (!style) {
+      const error = new Error('존재하지 않습니다');
+      error.status = 404;
+      throw error;
+    }
+
+    const count = Number(style.curationCount);
+    const newCount = count - 1;
+
+    if (newCount < 0) {
+      const error = new Error('잘못된 요청입니다');
+      error.status = 400;
+      throw error;
+    }
+
+    let newTrendyAvg = 0;
+    let newUniqueAvg = 0;
+    let newPracticalAvg = 0;
+    let newCostAvg = 0;
+    let newTotalAvg = 0;
+
+    if (newCount > 0) {
+      newTrendyAvg =
+        (Number(style.trendyAverage) * count - existing.trendy) / newCount;
+
+      newUniqueAvg =
+        (Number(style.uniqueAverage) * count - existing.personality) / newCount;
+
+      newPracticalAvg =
+        (Number(style.practicalAverage) * count - existing.practicality) / newCount;
+
+      newCostAvg =
+        (Number(style.costEffectiveAverage) * count -
+          existing.costEffectiveness) /
+        newCount;
+
+      newTotalAvg =
+        (newTrendyAvg + newUniqueAvg + newPracticalAvg + newCostAvg) / newCount;
+    }
+
+    await tx.curation.delete({
+      where: { id: curationId }
+    });
+
+    await tx.style.update({
+      where: { id: styleId },
+      data: {
+        curationCount: newCount,
+        trendyAverage: newTrendyAvg,
+        uniqueAverage: newUniqueAvg,
+        practicalAverage: newPracticalAvg,
+        costEffectiveAverage: newCostAvg,
+        totalAverage: newTotalAvg
+      }
+    });
+  });
+
+  return res.status(200).send({ message: '큐레이팅 삭제 성공' });
 };
