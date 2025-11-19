@@ -238,3 +238,93 @@ erDiagram
 ├── app.js                # Express 애플리케이션의 진입점
 └── package.json          # 프로젝트 메타데이터 및 의존성 관리
 ```
+
+```mermaid
+erDiagram
+    Style {
+        int id PK "Style ID"
+        string nickname
+        string title
+        string content
+        string password
+        Decimal trendyAverage
+        Decimal uniqueAverage
+        Decimal practicalAverage
+        Decimal costEffectiveAverage
+        Decimal totalAverage
+        datetime createdAt
+        datetime updatedAt
+        int viewCount
+        int curationCount
+    }
+
+    Item {
+        int id PK "Item ID"
+        string itemName
+        string brandName
+        Decimal price
+        Category category "Enum: top, bottom, etc."
+        int styleId FK "Foreign Key to Style"
+    }
+
+    Category {
+        enum type "top, bottom, outer, dress, shoes, bag, accessory"
+    }
+
+    Tag {
+        int id PK "Tag ID"
+        string tag "Unique tag name"
+        int styleCount
+        int clickCount
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    Image {
+        int id PK "Image ID"
+        string url "Image URL"
+        boolean isThumbnail
+        datetime createdAt
+        datetime updatedAt
+        int styleId FK "Foreign Key to Style"
+    }
+
+    Curation {
+        int id PK "Curation ID"
+        int trendy
+        int personality
+        int practicality
+        int costEffectiveness
+        string content
+        string nickname
+        string password
+        datetime createdAt
+        datetime updatedAt
+        int styleId FK "Foreign Key to Style"
+    }
+
+    CurationComment {
+        int id PK "Comment ID"
+        string content
+        string password
+        datetime createdAt
+        datetime updatedAt
+        int curationId FK "Foreign Key to Curation (Unique)"
+        int styleId FK "Foreign Key to Style"
+    }
+
+    LineImage {
+        int id PK
+        int lineId "Unique Line ID"
+        string url
+        datetime createdAt
+    }
+
+    'Style' o|--|{ 'Item' : "contains"
+    'Style' o|--|{ 'Image' : "has"
+    'Style' o|--|{ 'Curation' : "receives"
+    'Style' o|--|{ 'CurationComment' : "has"
+    'Style' }o--o{ 'Tag' : "is tagged with"
+    'Curation' ||--|| 'CurationComment' : "has one"
+    'Item' o|--|| 'Category' : "is categorized as"
+```
